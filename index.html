@@ -1,0 +1,585 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0" />
+<title>The Ledger</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>📒</text></svg>" />
+<style>
+  html, body { margin: 0; padding: 0; background: #0B0B10; }
+</style>
+<script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+<script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+<script crossorigin src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+</head>
+<body>
+<div id="root"></div>
+<script type="text/plain" id="ledger-src">
+const { useState, useEffect, useCallback, useRef } = React;
+
+// ---------------- ICONS ----------------
+function Icon({ name, size = 16, color = "currentColor", style }) {
+  const p = { width: size, height: size, viewBox: "0 0 24 24", fill: "none", stroke: color, strokeWidth: 2, strokeLinecap: "round", strokeLinejoin: "round", style };
+  switch (name) {
+    case "dumbbell":
+      return <svg {...p}><path d="M4 9v6M20 9v6M2 12h2M20 12h2M7 6v12M17 6v12" /><rect x="6" y="9" width="2" height="6" fill={color} stroke="none" /><rect x="16" y="9" width="2" height="6" fill={color} stroke="none" /></svg>;
+    case "music":
+      return <svg {...p}><path d="M9 18V5l11-2v13" /><circle cx="6" cy="18" r="3" /><circle cx="17" cy="16" r="3" /></svg>;
+    case "users":
+      return <svg {...p}><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" /><circle cx="9" cy="7" r="4" /><path d="M22 21v-2a4 4 0 0 0-3-3.87" /><path d="M16 3.13a4 4 0 0 1 0 7.75" /></svg>;
+    case "scroll":
+      return <svg {...p}><rect x="5" y="3" width="14" height="18" rx="2" /><path d="M9 8h6M9 12h6M9 16h4" /></svg>;
+    case "briefcase":
+      return <svg {...p}><rect x="3" y="7" width="18" height="13" rx="2" /><path d="M8 7V5a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" /><path d="M3 12h18" /></svg>;
+    case "plus":
+      return <svg {...p}><path d="M12 5v14M5 12h14" /></svg>;
+    case "x":
+      return <svg {...p}><path d="M18 6 6 18M6 6l12 12" /></svg>;
+    case "check":
+      return <svg {...p}><path d="M20 6 9 17l-5-5" /></svg>;
+    case "gem":
+      return <svg {...p}><path d="M6 3h12l3 5-9 13L3 8z" /><path d="M3 8h18M9 3l3 5 3-5M12 8l-3 13M12 8l3 13" /></svg>;
+    case "sparkles":
+      return <svg {...p}><path d="M12 3v4M12 17v4M3 12h4M17 12h4M6 6l2.5 2.5M15.5 15.5 18 18M18 6l-2.5 2.5M8.5 15.5 6 18" /></svg>;
+    case "skull":
+      return <svg {...p}><circle cx="12" cy="11" r="7" /><circle cx="9" cy="10" r="1.2" fill={color} stroke="none" /><circle cx="15" cy="10" r="1.2" fill={color} stroke="none" /><path d="M9 18v2M15 18v2M9 15h6" /></svg>;
+    case "shield":
+      return <svg {...p}><path d="M12 2 4 5v6c0 5 3.5 8.5 8 11 4.5-2.5 8-6 8-11V5z" /></svg>;
+    case "sword":
+      return <svg {...p}><path d="M5 19 19 5M15 5h4v4M9 15l-4 4M13 11l2 2" /></svg>;
+    default:
+      return null;
+  }
+}
+
+// ---------------- DEFS ----------------
+const STATS = {
+  body:  { label: "Body",  icon: "dumbbell", color: "#8CA88C", desc: "training, health" },
+  craft: { label: "Craft", icon: "music",     color: "#B08A5A", desc: "solo dev, Mythbound" },
+  bond:  { label: "Bond",  icon: "users",     color: "#7C93A8", desc: "people who matter" },
+  order: { label: "Order", icon: "scroll",    color: "#A8895A", desc: "admin, life upkeep" },
+  path:  { label: "Path",  icon: "briefcase", color: "#9A7CA8", desc: "career, opportunity" },
+};
+
+const RARITY = [
+  { key: "common",   weight: 60, color: "#8B8378", shards: [3, 6] },
+  { key: "uncommon", weight: 25, color: "#6FA88C", shards: [7, 12] },
+  { key: "rare",     weight: 12, color: "#5C8FB0", shards: [13, 22] },
+  { key: "epic",     weight: 3,  color: "#B0678F", shards: [25, 40] },
+];
+
+const SIGILS = [
+  { text: "Iron Resolve — Body pays double XP today.", stat: "body", mult: 2 },
+  { text: "Muse's Favor — Craft pays double XP today.", stat: "craft", mult: 2 },
+  { text: "Open Door — Bond pays double XP today.", stat: "bond", mult: 2 },
+  { text: "The Static Hour — Order pays double XP today.", stat: "order", mult: 2 },
+  { text: "Clear Signal — Path pays double XP today.", stat: "path", mult: 2 },
+  { text: "Windfall — all loot rolls +1 rarity tier today.", stat: "loot", mult: 1 },
+  { text: "Quiet Day — no modifier. Progress is still progress.", stat: null, mult: 1 },
+];
+
+const CHALLENGE_POOL = [
+  { text: "30 pushups. If you finish clean, do 5 more.", cat: "body", xp: 20 },
+  { text: "Fix the bug or system you've been avoiding in Mythbound.", cat: "craft", xp: 30 },
+  { text: "20 uninterrupted minutes on the hardest part of solo dev.", cat: "craft", xp: 25 },
+  { text: "Go to failure on one gym exercise today.", cat: "body", xp: 22 },
+  { text: "Reach out to one FIEA person you haven't talked to in a while.", cat: "bond", xp: 18 },
+  { text: "Learn one new technique or tool you don't already know.", cat: "craft", xp: 22 },
+  { text: "Full deep clean of one room, no shortcuts.", cat: "order", xp: 20 },
+  { text: "Compose or arrange music for 20 min, no distractions.", cat: "craft", xp: 18 },
+];
+
+const DEFAULT_POOL = [
+  { id: "b1", cat: "body", text: "Full gym session", ignition: "Put on gym clothes and leave the house", xp: 20 },
+  { id: "b2", cat: "body", text: "Mobility / stretch, 15 min", ignition: "Sit down and do one stretch", xp: 10 },
+  { id: "b3", cat: "body", text: "Sleep on time tonight", ignition: "Set tonight's alarm now", xp: 12 },
+  { id: "b4", cat: "body", text: "Cook a real meal", ignition: "Pull out one ingredient", xp: 10 },
+  { id: "c1", cat: "craft", text: "Solo dev: ship one meaningful chunk", ignition: "Open the project", xp: 22 },
+  { id: "c2", cat: "craft", text: "Mythbound: ship one meaningful task", ignition: "Open the relevant file", xp: 20 },
+  { id: "c3", cat: "craft", text: "Portfolio site: one real improvement", ignition: "Open the site's source", xp: 12 },
+  { id: "c4", cat: "craft", text: "Code review / documentation pass", ignition: "Open the doc or diff", xp: 10 },
+  { id: "n1", cat: "bond", text: "Real undistracted time with your girlfriend", ignition: "Put your phone in another room", xp: 15 },
+  { id: "n2", cat: "bond", text: "Play with Hera, no phone", ignition: "Grab a toy", xp: 8 },
+  { id: "n3", cat: "bond", text: "Reach out to a FIEA person", ignition: "Open the chat thread", xp: 10 },
+  { id: "o1", cat: "order", text: "Inbox / admin cleanup", ignition: "Open one tab you've been avoiding", xp: 8 },
+  { id: "o2", cat: "order", text: "Laundry, fully folded and put away", ignition: "Start the load", xp: 10 },
+  { id: "o3", cat: "order", text: "Clean your room", ignition: "Pick up 5 things", xp: 10 },
+  { id: "o4", cat: "order", text: "Learn a new skill, any amount", ignition: "Find one resource", xp: 12 },
+  { id: "p1", cat: "path", text: "Take a new opportunity forward", ignition: "Read what it actually requires", xp: 14 },
+  { id: "p2", cat: "path", text: "Work toward making money", ignition: "Write down the next concrete step", xp: 16 },
+];
+
+const BONUS_POOL = [
+  { id: "m1", cat: "craft", text: "Compose or edit music, 30 min", xp: 15 },
+  { id: "m2", cat: "craft", text: "Just play/improvise, no pressure to finish anything", xp: 10 },
+];
+
+const DEFAULT_VAULT = [
+  { id: "r1", text: "Guilt-free gaming / doomscrolling block, no timer", cost: 25 },
+  { id: "r2", text: "Order the food you actually want", cost: 25 },
+  { id: "r3", text: "New gear / plugin / small purchase", cost: 80 },
+  { id: "r4", text: "A lazy morning, no alarm", cost: 40 },
+];
+
+const DEFAULT_BOSS = { name: "Solo Dev: Next Milestone", hp: 400, maxHp: 400 };
+
+// ---------------- Utility ----------------
+const uid = () => Math.random().toString(36).slice(2, 9);
+const todayStr = () => new Date().toDateString();
+const xpToLevel = (xp) => Math.floor(xp / 100) + 1;
+const xpInLevel = (xp) => xp % 100;
+const STORAGE_KEY = "the-ledger-state";
+
+function rollRarity(bonus = false) {
+  const roll = Math.random() * 100; let acc = 0, idx = 0;
+  for (let i = 0; i < RARITY.length; i++) { acc += RARITY[i].weight; if (roll <= acc) { idx = i; break; } }
+  if (bonus) idx = Math.min(idx + 1, RARITY.length - 1);
+  const r = RARITY[idx];
+  const shards = Math.floor(r.shards[0] + Math.random() * (r.shards[1] - r.shards[0]));
+  return { rarity: r.key, color: r.color, shards };
+}
+
+function drawDailyQuests(pool, stats) {
+  const catXp = Object.fromEntries(Object.keys(STATS).map(k => [k, stats[k]?.xp ?? 0]));
+  const maxXp = Math.max(...Object.values(catXp), 1);
+  let bag = pool.map(q => ({ q, w: (maxXp - catXp[q.cat] + 20) }));
+  const chosen = [];
+  for (let i = 0; i < 3 && bag.length; i++) {
+    const total = bag.reduce((s, x) => s + x.w, 0);
+    let r = Math.random() * total, pick = 0;
+    for (; pick < bag.length; pick++) { r -= bag[pick].w; if (r <= 0) break; }
+    pick = Math.min(pick, bag.length - 1);
+    chosen.push({ ...bag[pick].q, uid: uid(), stage: "new" });
+    bag.splice(pick, 1);
+  }
+  return chosen;
+}
+
+const defaultState = () => ({
+  stats: Object.fromEntries(Object.keys(STATS).map(k => [k, { xp: 0 }])),
+  shards: 0, streak: 0, staticMeter: 0, lastOpen: null,
+  sigil: SIGILS[6], wheel: { date: null, challenge: null, done: false },
+  dailyQuests: [], pool: DEFAULT_POOL, bonusPool: BONUS_POOL,
+  sideQuests: [], vault: DEFAULT_VAULT, boss: DEFAULT_BOSS, lootLog: [],
+});
+
+function TheLedger() {
+  const [state, setState] = useState(null);
+  const [loaded, setLoaded] = useState(false);
+  const [toastMsg, setToastMsg] = useState(null);
+  const [tab, setTab] = useState("board");
+  const [spinning, setSpinning] = useState(false);
+  const [spinLabel, setSpinLabel] = useState("tap to spin");
+  const [newQuest, setNewQuest] = useState({ cat: "body", text: "", xp: 15, ignition: "" });
+  const [newSide, setNewSide] = useState({ text: "", xp: 30 });
+  const [newReward, setNewReward] = useState({ text: "", cost: 30 });
+  const spinIv = useRef(null);
+
+  const persist = useCallback((s) => {
+    try { localStorage.setItem(STORAGE_KEY, JSON.stringify(s)); } catch (e) { console.error(e); }
+  }, []);
+
+  useEffect(() => {
+    let s = defaultState();
+    try {
+      const raw = localStorage.getItem(STORAGE_KEY);
+      if (raw) s = { ...defaultState(), ...JSON.parse(raw) };
+    } catch (e) { /* first run */ }
+
+    if (s.lastOpen !== todayStr()) {
+      const missed = s.lastOpen && s.dailyQuests.some(q => q.stage !== "done");
+      s.staticMeter = missed ? Math.min(s.staticMeter + 1, 3) : Math.max(s.staticMeter - 1, 0);
+      s.streak = missed ? 0 : s.streak;
+      s.sigil = SIGILS[Math.floor(Math.random() * SIGILS.length)];
+      s.dailyQuests = drawDailyQuests(s.pool, s.stats);
+      s.wheel = { date: todayStr(), challenge: null, done: false };
+      s.lastOpen = todayStr();
+    }
+    setState(s);
+    setLoaded(true);
+  }, []);
+
+  useEffect(() => { if (loaded && state) persist(state); }, [state, loaded, persist]);
+
+  const showToast = (msg, color) => { setToastMsg({ msg, color }); setTimeout(() => setToastMsg(null), 2600); };
+
+  const igniteQuest = (u) => {
+    setState(prev => {
+      const s = structuredClone(prev);
+      const q = s.dailyQuests.find(x => x.uid === u);
+      if (!q || q.stage !== "new") return prev;
+      q.stage = "ignited";
+      s.shards += 2;
+      showToast("Started. +2 shards for showing up.", "#8B8378");
+      return s;
+    });
+  };
+
+  const completeQuest = (u, stretch = false) => {
+    setState(prev => {
+      const s = structuredClone(prev);
+      const q = s.dailyQuests.find(x => x.uid === u);
+      if (!q || q.stage === "done") return prev;
+      q.stage = "done";
+      const mult = (s.sigil.stat === q.cat) ? s.sigil.mult : 1;
+      let xpGain = Math.round(q.xp * mult);
+      if (stretch) xpGain = Math.round(xpGain * 1.4);
+      s.stats[q.cat].xp += xpGain;
+      const loot = rollRarity((s.sigil.stat === "loot") || stretch);
+      s.shards += loot.shards;
+      s.boss.hp = Math.max(0, s.boss.hp - Math.round(xpGain * 0.6));
+      s.lootLog.unshift({ id: uid(), text: q.text + (stretch ? " (pushed further)" : ""), rarity: loot.rarity, color: loot.color, shards: loot.shards, xp: xpGain, at: Date.now() });
+      s.lootLog = s.lootLog.slice(0, 30);
+      if (s.dailyQuests.every(x => x.stage === "done")) s.streak += 1;
+      showToast(`+${xpGain} XP · ${loot.shards} shards (${loot.rarity})`, loot.color);
+      return s;
+    });
+  };
+
+  const spinWheel = () => {
+    if (spinning || state.wheel.challenge) return;
+    setSpinning(true);
+    let ticks = 0;
+    spinIv.current = setInterval(() => {
+      setSpinLabel(CHALLENGE_POOL[Math.floor(Math.random() * CHALLENGE_POOL.length)].text);
+      ticks++;
+      if (ticks > 14) {
+        clearInterval(spinIv.current);
+        const pick = CHALLENGE_POOL[Math.floor(Math.random() * CHALLENGE_POOL.length)];
+        setSpinning(false);
+        setState(prev => ({ ...prev, wheel: { date: todayStr(), challenge: pick, done: false } }));
+      }
+    }, 90);
+  };
+
+  const completeChallenge = () => {
+    setState(prev => {
+      const s = structuredClone(prev);
+      const c = s.wheel.challenge;
+      if (!c || s.wheel.done) return prev;
+      s.wheel.done = true;
+      const mult = (s.sigil.stat === c.cat) ? s.sigil.mult : 1;
+      const xpGain = Math.round(c.xp * mult);
+      s.stats[c.cat].xp += xpGain;
+      const loot = rollRarity(true);
+      s.shards += loot.shards;
+      s.lootLog.unshift({ id: uid(), text: "Wheel: " + c.text, rarity: loot.rarity, color: loot.color, shards: loot.shards, xp: xpGain, at: Date.now() });
+      showToast(`Challenge cleared! +${xpGain} XP · ${loot.shards} shards`, loot.color);
+      return s;
+    });
+  };
+
+  const completeBonus = (bId) => {
+    setState(prev => {
+      const s = structuredClone(prev);
+      const b = s.bonusPool.find(x => x.id === bId);
+      if (!b) return prev;
+      s.stats[b.cat].xp += b.xp;
+      const loot = rollRarity(false);
+      s.shards += loot.shards;
+      s.lootLog.unshift({ id: uid(), text: "Bonus: " + b.text, rarity: loot.rarity, color: loot.color, shards: loot.shards, xp: b.xp, at: Date.now() });
+      showToast(`+${b.xp} XP · ${loot.shards} shards`, loot.color);
+      return s;
+    });
+  };
+
+  const addPoolQuest = () => {
+    if (!newQuest.text.trim()) return;
+    setState(prev => ({ ...prev, pool: [...prev.pool, { id: uid(), cat: newQuest.cat, text: newQuest.text, xp: newQuest.xp, ignition: newQuest.ignition || "Just start" }] }));
+    setNewQuest({ cat: "body", text: "", xp: 15, ignition: "" });
+    showToast("Added to quest pool", "#8CA88C");
+  };
+
+  const addSideQuest = () => {
+    if (!newSide.text.trim()) return;
+    setState(prev => ({ ...prev, sideQuests: [...prev.sideQuests, { id: uid(), uid: uid(), cat: "path", text: newSide.text, xp: newSide.xp, stage: "new" }] }));
+    setNewSide({ text: "", xp: 30 });
+  };
+
+  const completeSide = (u) => {
+    setState(prev => {
+      const s = structuredClone(prev);
+      const q = s.sideQuests.find(x => x.uid === u);
+      if (!q || q.stage === "done") return prev;
+      q.stage = "done";
+      s.stats[q.cat].xp += q.xp;
+      const loot = rollRarity(false);
+      s.shards += loot.shards;
+      s.lootLog.unshift({ id: uid(), text: q.text, rarity: loot.rarity, color: loot.color, shards: loot.shards, xp: q.xp, at: Date.now() });
+      showToast(`+${q.xp} XP · ${loot.shards} shards`, loot.color);
+      return s;
+    });
+  };
+
+  const removeSide = (u) => setState(prev => ({ ...prev, sideQuests: prev.sideQuests.filter(q => q.uid !== u) }));
+  const addReward = () => {
+    if (!newReward.text.trim()) return;
+    setState(prev => ({ ...prev, vault: [...prev.vault, { id: uid(), ...newReward }] }));
+    setNewReward({ text: "", cost: 30 });
+  };
+  const removeReward = (id) => setState(prev => ({ ...prev, vault: prev.vault.filter(r => r.id !== id) }));
+  const redeem = (r) => {
+    setState(prev => {
+      if (prev.shards < r.cost) { showToast("Not enough shards", "#B0678F"); return prev; }
+      showToast(`Redeemed: ${r.text}`, "#6FA88C");
+      return { ...prev, shards: prev.shards - r.cost };
+    });
+  };
+
+  if (!loaded || !state) {
+    return <div style={{ background: "#12121A", minHeight: "100vh", display: "flex", alignItems: "center", justifyContent: "center", color: "#8B8378", fontFamily: "monospace" }}>loading the ledger…</div>;
+  }
+
+  const charLevel = Math.floor(Object.values(state.stats).reduce((a, s) => a + xpToLevel(s.xp), 0) / 5);
+
+  return (
+    <div style={{ minHeight: "100vh", background: "radial-gradient(ellipse at top, #1A1A24 0%, #0F0F16 60%, #0B0B10 100%)", color: "#E4DECB", fontFamily: "'Inter', system-ui, sans-serif", paddingBottom: "80px" }}>
+      <style>{`
+        @import url('https://fonts.googleapis.com/css2?family=Spectral:wght@400;600;700&family=JetBrains+Mono:wght@400;500;700&family=Inter:wght@400;500;600&display=swap');
+        * { box-sizing: border-box; }
+        .disp { font-family: 'Spectral', serif; }
+        .mono { font-family: 'JetBrains Mono', monospace; }
+        .card { background: linear-gradient(160deg, #1C1C28 0%, #17171F 100%); border: 1px solid #2B2B38; border-radius: 10px; }
+        .btn { cursor: pointer; transition: all .15s ease; }
+        .btn:hover { filter: brightness(1.15); }
+        .btn:active { transform: scale(0.97); }
+        input, textarea, select { background: #14141C; border: 1px solid #2B2B38; color: #E4DECB; border-radius: 6px; padding: 6px 8px; font-family: inherit; font-size: 13px; }
+        input:focus, textarea:focus, select:focus { outline: 1px solid #6FA88C; }
+        @keyframes flicker { 0%{opacity:0} 15%{opacity:1} 18%{opacity:.3} 22%{opacity:1} 100%{opacity:1} }
+        @keyframes pulse { 0%{opacity:1} 50%{opacity:.4} 100%{opacity:1} }
+      `}</style>
+
+      <div style={{ padding: "22px 18px 14px", borderBottom: "1px solid #23232F" }}>
+        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline" }}>
+          <div>
+            <div className="disp" style={{ fontSize: "22px", fontWeight: 700 }}>The Ledger</div>
+            <div className="mono" style={{ fontSize: "11px", color: "#7A7566", marginTop: "2px" }}>character level {charLevel} · streak {state.streak} {state.streak > 0 ? "🔥" : ""}</div>
+          </div>
+          <div style={{ display: "flex", alignItems: "center", gap: "6px" }} className="mono">
+            <Icon name="gem" size={16} color="#5C8FB0" />
+            <span style={{ fontSize: "16px", fontWeight: 700 }}>{state.shards}</span>
+          </div>
+        </div>
+        <div style={{ marginTop: "12px", padding: "10px 12px", borderRadius: "8px", background: "#1A1A24", border: "1px solid #2B2B38", animation: "flicker 1.2s ease" }}>
+          <div style={{ fontSize: "10px", letterSpacing: "1.5px", color: "#7A7566", marginBottom: "3px" }} className="mono">TODAY'S SIGIL</div>
+          <div style={{ fontSize: "13px", color: "#C9A876" }}>{state.sigil.text}</div>
+        </div>
+        {state.staticMeter > 0 && (
+          <div style={{ marginTop: "8px", fontSize: "11px", color: "#B0678F" }} className="mono">
+            static building — {state.staticMeter}/3. finish today's board to clear it. no lost progress, just friction.
+          </div>
+        )}
+      </div>
+
+      <div style={{ padding: "16px 18px", display: "grid", gridTemplateColumns: "1fr 1fr", gap: "10px" }}>
+        {Object.entries(STATS).map(([key, def]) => {
+          const s = state.stats[key];
+          const lvl = xpToLevel(s.xp), pct = xpInLevel(s.xp);
+          return (
+            <div key={key} className="card" style={{ padding: "10px" }}>
+              <div style={{ display: "flex", alignItems: "center", gap: "6px", marginBottom: "6px" }}>
+                <Icon name={def.icon} size={14} color={def.color} />
+                <span style={{ fontSize: "12px", fontWeight: 600 }}>{def.label}</span>
+                <span className="mono" style={{ fontSize: "10px", color: "#7A7566", marginLeft: "auto" }}>Lv{lvl}</span>
+              </div>
+              <div style={{ height: "5px", background: "#0F0F16", borderRadius: "3px", overflow: "hidden" }}>
+                <div style={{ width: `${pct}%`, height: "100%", background: def.color, transition: "width .4s" }} />
+              </div>
+            </div>
+          );
+        })}
+        <div className="card" style={{ padding: "10px", gridColumn: "1 / 3" }}>
+          <div style={{ fontSize: "10px", color: "#7A7566", marginBottom: "3px" }} className="mono">BOSS: {state.boss.name}</div>
+          <div style={{ height: "6px", background: "#0F0F16", borderRadius: "3px", overflow: "hidden" }}>
+            <div style={{ width: `${(state.boss.hp / state.boss.maxHp) * 100}%`, height: "100%", background: "#B0678F", transition: "width .4s" }} />
+          </div>
+          <div className="mono" style={{ fontSize: "10px", color: "#7A7566", marginTop: "3px" }}>{state.boss.hp}/{state.boss.maxHp} hp</div>
+        </div>
+      </div>
+
+      <div style={{ padding: "0 18px 6px" }}>
+        <div className="card" style={{ padding: "14px", textAlign: "center" }}>
+          <div className="mono" style={{ fontSize: "11px", letterSpacing: "1.5px", color: "#7A7566", marginBottom: "8px" }}>DAILY CHALLENGE WHEEL</div>
+          <div style={{ fontSize: "14px", minHeight: "38px", display: "flex", alignItems: "center", justifyContent: "center", padding: "0 8px", color: spinning ? "#9A9585" : "#E4DECB", animation: spinning ? "pulse .12s infinite" : "none" }}>
+            {spinning ? spinLabel : (state.wheel.challenge ? state.wheel.challenge.text : "tap to spin")}
+          </div>
+          <div style={{ marginTop: "10px" }}>
+            {!state.wheel.challenge && !spinning && (
+              <div className="btn" onClick={spinWheel} style={{ display: "inline-block", background: "#6FA88C", color: "#0F0F16", borderRadius: "7px", padding: "8px 16px", fontSize: "12px", fontWeight: 700 }}>Spin the wheel</div>
+            )}
+            {state.wheel.challenge && !state.wheel.done && (
+              <div className="btn" onClick={completeChallenge} style={{ display: "inline-block", background: "#6FA88C", color: "#0F0F16", borderRadius: "7px", padding: "8px 16px", fontSize: "12px", fontWeight: 700 }}>Mark cleared</div>
+            )}
+            {state.wheel.done && <span className="mono" style={{ fontSize: "11px", color: "#7A7566" }}>cleared today ✓</span>}
+          </div>
+        </div>
+      </div>
+
+      <div style={{ display: "flex", gap: "2px", padding: "0 12px", borderBottom: "1px solid #23232F", overflowX: "auto" }}>
+        {[["board", "Board", "sword"], ["bonus", "Bonus", "sparkles"], ["side", "Side Quests", "skull"], ["vault", "Vault", "gem"], ["log", "Loot Log", "sparkles"], ["pool", "Edit Pool", "shield"]].map(([key, label, iconName]) => (
+          <div key={key} onClick={() => setTab(key)} className="btn" style={{ display: "flex", alignItems: "center", gap: "5px", padding: "10px", fontSize: "12px", whiteSpace: "nowrap", color: tab === key ? "#E4DECB" : "#7A7566", borderBottom: tab === key ? "2px solid #6FA88C" : "2px solid transparent" }}>
+            <Icon name={iconName} size={13} /> {label}
+          </div>
+        ))}
+      </div>
+
+      <div style={{ padding: "16px 18px" }}>
+        {tab === "board" && (
+          <div style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
+            {state.dailyQuests.length === 0 && <div style={{ color: "#7A7566", fontSize: "13px" }}>No quests drawn — add some in Edit Pool.</div>}
+            {state.dailyQuests.map(q => {
+              const def = STATS[q.cat];
+              const boosted = state.sigil.stat === q.cat;
+              return (
+                <div key={q.uid} className="card" style={{ padding: "12px", opacity: q.stage === "done" ? 0.45 : 1, display: "flex", alignItems: "flex-start", gap: "10px" }}>
+                  <Icon name={def.icon} size={16} color={def.color} style={{ marginTop: "2px" }} />
+                  <div style={{ flex: 1 }}>
+                    <div style={{ fontSize: "13px", textDecoration: q.stage === "done" ? "line-through" : "none" }}>{q.text}</div>
+                    <div className="mono" style={{ fontSize: "10px", color: "#7A7566" }}>{def.label} · {q.xp} xp{boosted ? " ×2" : ""}</div>
+                    {q.stage === "new" && <div style={{ fontSize: "11px", color: "#9A9585", marginTop: "4px", fontStyle: "italic" }}>start with: {q.ignition}</div>}
+                  </div>
+                  <div style={{ display: "flex", flexDirection: "column", gap: "6px", minWidth: "88px" }}>
+                    {q.stage === "new" && (
+                      <>
+                        <div className="btn" onClick={() => igniteQuest(q.uid)} style={{ border: "1px solid #2B2B38", color: "#9A9585", borderRadius: "6px", padding: "6px 8px", fontSize: "11px", textAlign: "center" }}>Just start</div>
+                        <div className="btn" onClick={() => completeQuest(q.uid)} style={{ background: "#6FA88C", color: "#0F0F16", borderRadius: "6px", padding: "6px 8px", fontSize: "11px", fontWeight: 600, textAlign: "center" }}>Done</div>
+                      </>
+                    )}
+                    {q.stage === "ignited" && (
+                      <div className="btn" onClick={() => completeQuest(q.uid)} style={{ background: "#6FA88C", color: "#0F0F16", borderRadius: "6px", padding: "6px 8px", fontSize: "11px", fontWeight: 600, textAlign: "center" }}>Finish it</div>
+                    )}
+                    {q.stage === "done" && (
+                      <div className="btn" onClick={() => completeQuest(q.uid, true)} style={{ border: "1px solid #2B2B38", color: "#9A9585", borderRadius: "6px", padding: "6px 8px", fontSize: "10px", textAlign: "center" }}>Push further</div>
+                    )}
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        )}
+
+        {tab === "bonus" && (
+          <div style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
+            <div style={{ fontSize: "12px", color: "#7A7566" }}>Never mandatory, never competes with the daily board. Pure upside.</div>
+            {state.bonusPool.map(b => {
+              const def = STATS[b.cat];
+              return (
+                <div key={b.id} className="card" style={{ padding: "12px", display: "flex", alignItems: "center", gap: "10px" }}>
+                  <Icon name={def.icon} size={16} color={def.color} />
+                  <div style={{ flex: 1 }}>
+                    <div style={{ fontSize: "13px" }}>{b.text}</div>
+                    <div className="mono" style={{ fontSize: "10px", color: "#7A7566" }}>{def.label} · {b.xp} xp</div>
+                  </div>
+                  <div className="btn" onClick={() => completeBonus(b.id)} style={{ background: "#6FA88C", color: "#0F0F16", borderRadius: "6px", padding: "6px 10px", fontSize: "11px", fontWeight: 600 }}>Done</div>
+                </div>
+              );
+            })}
+          </div>
+        )}
+
+        {tab === "side" && (
+          <div style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
+            <div className="card" style={{ padding: "10px", display: "flex", gap: "6px" }}>
+              <input placeholder="One-off bigger quest…" value={newSide.text} onChange={e => setNewSide({ ...newSide, text: e.target.value })} style={{ flex: 1 }} />
+              <input type="number" value={newSide.xp} onChange={e => setNewSide({ ...newSide, xp: +e.target.value })} style={{ width: "60px" }} />
+              <div className="btn" onClick={addSideQuest} style={{ background: "#7C93A8", borderRadius: "6px", padding: "6px 10px", display: "flex", alignItems: "center" }}><Icon name="plus" size={14} color="#0F0F16" /></div>
+            </div>
+            {state.sideQuests.length === 0 && <div style={{ color: "#7A7566", fontSize: "13px" }}>Side quests are for the bigger, non-daily things.</div>}
+            {state.sideQuests.map(q => (
+              <div key={q.uid} className="card" style={{ padding: "12px", opacity: q.stage === "done" ? 0.45 : 1, display: "flex", alignItems: "center", gap: "10px" }}>
+                <Icon name="skull" size={15} color="#B0678F" />
+                <div style={{ flex: 1 }}>
+                  <div style={{ fontSize: "13px", textDecoration: q.stage === "done" ? "line-through" : "none" }}>{q.text}</div>
+                  <div className="mono" style={{ fontSize: "10px", color: "#7A7566" }}>{q.xp} xp</div>
+                </div>
+                {q.stage !== "done" ? (
+                  <div className="btn" onClick={() => completeSide(q.uid)} style={{ background: "#6FA88C", color: "#0F0F16", borderRadius: "6px", padding: "6px 10px", fontSize: "11px", fontWeight: 600 }}><Icon name="check" size={13} /></div>
+                ) : (
+                  <div className="btn" onClick={() => removeSide(q.uid)}><Icon name="x" size={14} color="#7A7566" /></div>
+                )}
+              </div>
+            ))}
+          </div>
+        )}
+
+        {tab === "vault" && (
+          <div style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
+            <div className="card" style={{ padding: "10px", display: "flex", gap: "6px" }}>
+              <input placeholder="Reward you can redeem…" value={newReward.text} onChange={e => setNewReward({ ...newReward, text: e.target.value })} style={{ flex: 1 }} />
+              <input type="number" value={newReward.cost} onChange={e => setNewReward({ ...newReward, cost: +e.target.value })} style={{ width: "60px" }} />
+              <div className="btn" onClick={addReward} style={{ background: "#7C93A8", borderRadius: "6px", padding: "6px 10px", display: "flex", alignItems: "center" }}><Icon name="plus" size={14} color="#0F0F16" /></div>
+            </div>
+            {state.vault.map(r => (
+              <div key={r.id} className="card" style={{ padding: "12px", display: "flex", alignItems: "center", gap: "10px" }}>
+                <Icon name="gem" size={15} color="#5C8FB0" />
+                <div style={{ flex: 1, fontSize: "13px" }}>{r.text}</div>
+                <div className="mono" style={{ fontSize: "11px", color: "#7A7566" }}>{r.cost}</div>
+                <div className="btn" onClick={() => redeem(r)} style={{ background: state.shards >= r.cost ? "#C9A876" : "#2B2B38", color: state.shards >= r.cost ? "#0F0F16" : "#7A7566", borderRadius: "6px", padding: "6px 10px", fontSize: "11px", fontWeight: 600 }}>Redeem</div>
+                <Icon name="x" size={13} color="#4A4A55" style={{ cursor: "pointer" }} className="btn" onClick={() => removeReward(r.id)} />
+              </div>
+            ))}
+          </div>
+        )}
+
+        {tab === "log" && (
+          <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
+            {state.lootLog.length === 0 && <div style={{ color: "#7A7566", fontSize: "13px" }}>Nothing yet. Complete a quest.</div>}
+            {state.lootLog.map(l => (
+              <div key={l.id} className="card" style={{ padding: "10px 12px", display: "flex", alignItems: "center", gap: "8px" }}>
+                <div style={{ width: "8px", height: "8px", borderRadius: "50%", background: l.color }} />
+                <div style={{ flex: 1, fontSize: "12px" }}>{l.text}</div>
+                <div className="mono" style={{ fontSize: "10px", color: "#7A7566" }}>+{l.xp}xp · {l.shards}sh · {l.rarity}</div>
+              </div>
+            ))}
+          </div>
+        )}
+
+        {tab === "pool" && (
+          <div style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
+            <div className="card" style={{ padding: "10px", display: "flex", gap: "6px", flexWrap: "wrap" }}>
+              <select value={newQuest.cat} onChange={e => setNewQuest({ ...newQuest, cat: e.target.value })}>
+                {Object.entries(STATS).map(([k, v]) => <option key={k} value={k}>{v.label}</option>)}
+              </select>
+              <input placeholder="Quest text…" value={newQuest.text} onChange={e => setNewQuest({ ...newQuest, text: e.target.value })} style={{ flex: 1, minWidth: "120px" }} />
+              <input type="number" value={newQuest.xp} onChange={e => setNewQuest({ ...newQuest, xp: +e.target.value })} style={{ width: "60px" }} />
+              <input placeholder="Ignition step (2-min starter)…" value={newQuest.ignition} onChange={e => setNewQuest({ ...newQuest, ignition: e.target.value })} style={{ flex: 1, minWidth: "160px" }} />
+              <div className="btn" onClick={addPoolQuest} style={{ background: "#7C93A8", borderRadius: "6px", padding: "6px 10px", display: "flex", alignItems: "center" }}><Icon name="plus" size={14} color="#0F0F16" /></div>
+            </div>
+            <div className="mono" style={{ fontSize: "11px", color: "#7A7566" }}>{state.pool.length} quests in the pool. Each day draws 3, weighted toward whichever stat has fallen behind.</div>
+            {Object.entries(STATS).map(([key, def]) => (
+              <div key={key} style={{ marginTop: "4px" }}>
+                <div style={{ fontSize: "11px", color: def.color, marginBottom: "4px" }} className="mono">{def.label.toUpperCase()}</div>
+                {state.pool.filter(q => q.cat === key).map(q => (
+                  <div key={q.id} style={{ fontSize: "12px", color: "#B5AF9C", padding: "3px 0", display: "flex", justifyContent: "space-between" }}>
+                    <span>{q.text}</span><span className="mono" style={{ color: "#7A7566" }}>{q.xp}xp</span>
+                  </div>
+                ))}
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
+
+      {toastMsg && (
+        <div style={{ position: "fixed", bottom: "18px", left: "50%", transform: "translateX(-50%)", background: "#1C1C28", border: `1px solid ${toastMsg.color}`, borderRadius: "8px", padding: "10px 16px", fontSize: "12px", color: "#E4DECB", boxShadow: "0 4px 20px rgba(0,0,0,0.4)" }} className="mono">
+          {toastMsg.msg}
+        </div>
+      )}
+    </div>
+  );
+}
+
+const root = ReactDOM.createRoot(document.getElementById("root"));
+root.render(<TheLedger />);
+</script>
+<script>
+  (function () {
+    const src = document.getElementById("ledger-src").textContent;
+    const compiled = Babel.transform(src, { presets: [["react", { runtime: "classic" }]] }).code;
+    const s = document.createElement("script");
+    s.textContent = compiled;
+    document.body.appendChild(s);
+  })();
+</script>
+</body>
+</html>
