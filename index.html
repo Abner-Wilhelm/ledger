@@ -72,6 +72,51 @@ function Icon({ name, size = 16, color = "currentColor", style }) {
   }
 }
 
+// ---------------- PIXEL SPRITES (items & enemies) ----------------
+function lighten(hex, amt) {
+  const c = (hex || "#CB9A3E").replace("#", "");
+  const num = parseInt(c, 16);
+  let r = (num >> 16) + amt, g = ((num >> 8) & 0xff) + amt, b = (num & 0xff) + amt;
+  r = Math.min(255, Math.max(0, r)); g = Math.min(255, Math.max(0, g)); b = Math.min(255, Math.max(0, b));
+  return `#${(1 << 24 | r << 16 | g << 8 | b).toString(16).slice(1)}`;
+}
+const BASE_PALETTE = { K: "#180f08", M: "#aab4bd", W: "#7a4a26", G: "#d8ad4e", R: "#c1543f", P: "#7c5a9e", B: "#3e7fae", N: "#4c8a57", E: "#c9a877", C: "#5a6b78", Y: "#f0d98a" };
+const SPRITES = {
+  sword: ["..KK....", "..MM....", "..MM....", "..MM....", "..MM....", ".KKKKK..", "..WW....", "..KK...."],
+  dagger: ["........", "..KK....", ".KMMK...", ".KMMK...", "..KK....", "..GG....", ".KWWK...", "..KK...."],
+  hammer: [".KKKKKK.", "KMMMMMMK", "KMMMMMMK", ".KKKKKK.", "...WW...", "...WW...", "...WW...", "...KK..."],
+  coin: ["..KKKK..", ".KGGGGK.", "KGGYGGGK", "KGGGGGGK", "KGGGGGGK", "KGGGGGGK", ".KGGGGK.", "..KKKK.."],
+  purse: ["...KK...", "..KGGK..", ".KGGGGK.", "KGGGGGGK", "KGGYGGGK", "KGGGGGGK", ".KGGGGK.", "..KKKK.."],
+  hourglass: [".KKKKKK.", ".KGGGGK.", "..KGGK..", "...KK...", "...KK...", "..KGGK..", ".KGGGGK.", ".KKKKKK."],
+  wardIcon: [".KKKKKK.", "KBBBBBBK", "KBBBBBBK", "KBBYBBK.", ".KBBBBK.", "..KBBK..", "...KK...", "........"],
+  band: ["........", "..KKKK..", ".KGGGGK.", "KGK..KGK", "KGK..KGK", ".KGGGGK.", "..KKKK..", "........"],
+  book: ["KKKKKKK.", "KWWWWWK.", "KWGGGWK.", "KWGGGWK.", "KWGGGWK.", "KWWWWWK.", "KKKKKKK.", "........"],
+  amulet: ["...KK...", "..K..K..", "...KK...", "..KPPK..", ".KPPPPK.", ".KPPPPK.", "..KPPK..", "...KK..."],
+  slime: ["........", "..NNNN..", ".NNNNNN.", "NNNYNNNN", "NNNNNNNN", "NNNNNNNN", ".NNNNNN.", "..KKKK.."],
+  bat: ["K......K", "KK....KK", "KKK..KKK", ".KKPPKK.", "..KPPK..", "..KPPK..", "...KK...", "........"],
+  skulker: ["..KKKK..", ".KCCCCK.", ".KCYYCK.", "..KCCK..", ".KKCCKK.", "KK.CC.KK", "...CC...", "..K..K.."],
+};
+const ARMOR_SPRITES = {
+  helmetItem: ["..KTTK..", ".KTTTTK.", "KTTTTTTK", "KTLLLLTK", "KTTTTTTK", ".KK..KK.", "........", "........"],
+  chestItem: [".KTTTTK.", "KTTTTTTK", "KTLLLLTK", "KTTTTTTK", "KTTTTTTK", "KTTTTTTK", ".KKKKKK.", "........"],
+  legsItem: [".KTTTTK.", "KTTTTTTK", "KTT..TTK", "KTT..TTK", "KTT..TTK", "KTT..TTK", "KKK..KKK", "........"],
+};
+function Sprite({ name, tint, size = 3 }) {
+  const grid = SPRITES[name] || ARMOR_SPRITES[name];
+  if (!grid) return null;
+  const palette = { ...BASE_PALETTE };
+  if (ARMOR_SPRITES[name]) { palette.T = tint || "#CB9A3E"; palette.L = lighten(tint || "#CB9A3E", 60); }
+  const cols = grid[0].length, rows = grid.length;
+  return (
+    <svg width={cols * size} height={rows * size} viewBox={`0 0 ${cols} ${rows}`} shapeRendering="crispEdges" style={{ display: "block" }}>
+      {grid.map((row, y) => row.split("").map((ch, x) => {
+        if (ch === "." || !palette[ch]) return null;
+        return <rect key={x + "-" + y} x={x} y={y} width={1} height={1} fill={palette[ch]} />;
+      }))}
+    </svg>
+  );
+}
+
 // ---------------- DEFS ----------------
 const STATS = {
   body:  { label: "Body",  icon: "dumbbell", color: "#C1543F", desc: "training, health" },
@@ -171,35 +216,62 @@ const THEMES = [
 ];
 const BASE_BOSS_HP = 480;
 
-// ---------------- EQUIPMENT: loadout (weekly, rotating) ----------------
+// ---------------- EQUIPMENT: item pool (weekly, rotating — nothing here is permanent) ----------------
 const LOADOUT_ITEMS = [
-  { id: "blade", slot: "weapon", name: "Worn Blade", desc: "Boss damage +15%.", cost: 100, icon: "sword", effect: { bossDmgMult: 1.15 } },
-  { id: "daggers", slot: "weapon", name: "Twin Daggers", desc: "15% chance to strike the boss twice.", cost: 140, icon: "sword", effect: { doubleBossChance: 0.15 } },
-  { id: "warhammer", slot: "weapon", name: "Warhammer", desc: "'Push further' completions deal +50% boss damage.", cost: 160, icon: "sword", effect: { stretchBossMult: 1.5 } },
-  { id: "luckyCoin", slot: "accessory", name: "Lucky Coin", desc: "Every loot roll is treated as blessed.", cost: 220, icon: "gem", effect: { lootBoost: true } },
-  { id: "purse", slot: "accessory", name: "Golden Purse", desc: "+10% shards from all loot.", cost: 200, icon: "chest", effect: { shardMult: 1.10 } },
-  { id: "hourglass", slot: "accessory", name: "Hourglass Charm", desc: "Fork encounters twice as often.", cost: 150, icon: "sparkles", effect: { forkMult: 2 } },
-  { id: "ward", slot: "accessory", name: "Guardian Ward", desc: "Missed days don't build the curse meter.", cost: 170, icon: "shield", effect: { noCurse: true } },
-  { id: "momentum", slot: "accessory", name: "Momentum Band", desc: "+2 bonus shards for every board quest after your first each day.", cost: 150, icon: "sparkles", effect: { momentum: 2 } },
-  { id: "ledger", slot: "accessory", name: "Merchant's Ledger", desc: "Vault reward costs -10%.", cost: 130, icon: "scroll", effect: { vaultDiscount: 0.9 } },
-  { id: "traveler", slot: "accessory", name: "Traveler's Charm", desc: "All stats gain +5% XP.", cost: 160, icon: "briefcase", effect: { xpMultAll: 1.05 } },
+  { id: "blade", slot: "weapon", name: "Worn Blade", desc: "+6 Attack. Boss damage +15%.", cost: 80, sprite: "sword", atk: 6, effect: { bossDmgMult: 1.15 } },
+  { id: "daggers", slot: "weapon", name: "Twin Daggers", desc: "+4 Attack. 15% chance to strike the boss twice.", cost: 110, sprite: "dagger", atk: 4, effect: { doubleBossChance: 0.15 } },
+  { id: "warhammer", slot: "weapon", name: "Warhammer", desc: "+8 Attack. 'Push further' completions deal +50% boss damage.", cost: 130, sprite: "hammer", atk: 8, effect: { stretchBossMult: 1.5 } },
+  { id: "luckyCoin", slot: "accessory", name: "Lucky Coin", desc: "Every loot roll is treated as blessed.", cost: 170, sprite: "coin", effect: { lootBoost: true } },
+  { id: "purse", slot: "accessory", name: "Golden Purse", desc: "+10% shards from all loot.", cost: 160, sprite: "purse", effect: { shardMult: 1.10 } },
+  { id: "hourglass", slot: "accessory", name: "Hourglass Charm", desc: "Fork encounters twice as often.", cost: 120, sprite: "hourglass", effect: { forkMult: 2 } },
+  { id: "ward", slot: "accessory", name: "Guardian Ward", desc: "+6 Defense. Missed days don't build the curse meter.", cost: 130, sprite: "wardIcon", def: 6, effect: { noCurse: true } },
+  { id: "momentum", slot: "accessory", name: "Momentum Band", desc: "+2 bonus shards for every board quest after your first each day.", cost: 120, sprite: "band", effect: { momentum: 2 } },
+  { id: "ledger", slot: "accessory", name: "Merchant's Ledger", desc: "Vault reward costs -10%.", cost: 100, sprite: "book", effect: { vaultDiscount: 0.9 } },
+  { id: "traveler", slot: "accessory", name: "Traveler's Charm", desc: "All stats gain +5% XP.", cost: 130, sprite: "amulet", effect: { xpMultAll: 1.05 } },
 ];
 
-// ---------------- EQUIPMENT: armor sets (permanent, no rarity, set-bonus focused) ----------------
-const ARMOR_SETS = [
-  { key: "roman", stat: "body", name: "Roman Legion", pieces: { helmet: "Legionary Helm", chest: "Segmented Cuirass", legs: "Marching Greaves" }, cost: 90,
-    bonus2: { label: "Body XP +8%", xpMult: 1.08 }, bonus3: { label: "Body XP +15%, and Body quests chip 5 bonus boss damage", xpMult: 1.15, bossChip: 5 } },
-  { key: "pirate", stat: "body", name: "Buccaneer's Rig", pieces: { helmet: "Tricorn Hat", chest: "Weathered Coat", legs: "Sea-Boots" }, cost: 90,
-    bonus2: { label: "Body XP +8%", xpMult: 1.08 }, bonus3: { label: "Body XP +15%, 20% chance to double loot on Body quests", xpMult: 1.15, doubleLootChance: 0.2 } },
-  { key: "space", stat: "craft", name: "Star-Forged Rig", pieces: { helmet: "Void Visor", chest: "Pressure Plate", legs: "Grav-Boots" }, cost: 90,
-    bonus2: { label: "Craft XP +8%", xpMult: 1.08 }, bonus3: { label: "Craft XP +15%, better loot odds on Craft quests", xpMult: 1.15, lootBoost: true } },
-  { key: "future", stat: "craft", name: "Netrunner's Kit", pieces: { helmet: "Neural Crown", chest: "Circuit Vest", legs: "Kinetic Boots" }, cost: 90,
-    bonus2: { label: "Craft XP +8%", xpMult: 1.08 }, bonus3: { label: "Craft XP +15%, double chance of a Fork on Craft quests", xpMult: 1.15, forkMult: 2 } },
-  { key: "kingdom", stat: "order", name: "Warden's Vestments", pieces: { helmet: "Iron Circlet", chest: "Warden's Plate", legs: "Sentinel Greaves" }, cost: 90,
-    bonus2: { label: "Order XP +8%", xpMult: 1.08 }, bonus3: { label: "Order XP +15%, curse meter caps at 2 instead of 3", xpMult: 1.15, curseCap: 2 } },
-  { key: "cowboy", stat: "order", name: "Ranger's Outfit", pieces: { helmet: "Wide-Brim Hat", chest: "Duster Coat", legs: "Spurred Boots" }, cost: 90,
-    bonus2: { label: "Order XP +8%", xpMult: 1.08 }, bonus3: { label: "Order XP +15%, +3 flat shards per Order quest", xpMult: 1.15, flatShardBonus: 3 } },
-];
+const THEME_ARMOR_NAMES = {
+  kingdom: { helmet: "Knight's Helm", chest: "Iron Cuirass", legs: "Steel Greaves" },
+  roman: { helmet: "Legionary Helm", chest: "Segmented Cuirass", legs: "Marching Greaves" },
+  pirate: { helmet: "Tricorn Hat", chest: "Weathered Coat", legs: "Sea-Boots" },
+  space: { helmet: "Void Visor", chest: "Pressure Plate", legs: "Grav-Boots" },
+  cowboy: { helmet: "Ten-Gallon Hat", chest: "Tumbleweed Chestplate", legs: "Cowboy Leggings" },
+  future: { helmet: "Neural Crown", chest: "Circuit Vest", legs: "Kinetic Boots" },
+};
+function themedArmorItems(theme) {
+  const names = THEME_ARMOR_NAMES[theme.key] || THEME_ARMOR_NAMES.kingdom;
+  return [
+    { id: `armor_helmet_${theme.key}`, slot: "helmet", name: names.helmet, desc: "+4 Defense, +10 max Health.", cost: 70, sprite: "helmetItem", def: 4, health: 10, themed: true },
+    { id: `armor_chest_${theme.key}`, slot: "chest", name: names.chest, desc: "+7 Defense, +20 max Health.", cost: 100, sprite: "chestItem", def: 7, health: 20, themed: true },
+    { id: `armor_legs_${theme.key}`, slot: "legs", name: names.legs, desc: "+5 Defense, +14 max Health.", cost: 80, sprite: "legsItem", def: 5, health: 14, themed: true },
+  ];
+}
+function allPoolItems(state) {
+  const theme = THEMES.find(t => t.key === state.run.theme) || THEMES[0];
+  return [...LOADOUT_ITEMS, ...themedArmorItems(theme)];
+}
+function findPoolItem(id, state) {
+  return allPoolItems(state).find(i => i.id === id) || null;
+}
+
+// ---------------- ENEMIES: roaming encounters, separate from the weekly boss ----------------
+const ENEMY_NAMES = {
+  kingdom: ["Grave Rat", "Wandering Wraithling", "Camp Skulker"],
+  roman: ["Deserter", "Bandit Scout", "Restless Shade"],
+  pirate: ["Bilge Rat", "Mutineer", "Reef Lurker"],
+  space: ["Rogue Drone", "Static Wisp", "Hull Vermin"],
+  cowboy: ["Rattlesnake", "Lone Coyote", "Tumbleweed Stalker"],
+  future: ["Glitch Sprite", "Rogue Bot", "Signal Leech"],
+};
+const ENEMY_SPRITES = ["slime", "bat", "skulker"];
+function rollEnemy(theme, charLevel) {
+  const names = ENEMY_NAMES[theme.key] || ENEMY_NAMES.kingdom;
+  const name = names[Math.floor(Math.random() * names.length)];
+  const power = 6 + charLevel * 3 + Math.floor(Math.random() * 5);
+  const reward = 8 + charLevel * 2 + Math.floor(Math.random() * 8);
+  const sprite = ENEMY_SPRITES[Math.floor(Math.random() * ENEMY_SPRITES.length)];
+  return { id: uid(), name, power, reward, sprite };
+}
 
 // ---------------- ACHIEVEMENTS ----------------
 const THEME_ACHIEVEMENTS = THEMES.map(t => ({ id: `clear_${t.key}`, name: `Conqueror of ${t.name}`, desc: `Defeat the boss during a ${t.name} run.`, check: s => s.clearedThemes.includes(t.key) }));
@@ -211,8 +283,8 @@ const ACHIEVEMENTS = [
   { id: "boss_slain", name: "Giant Slayer", desc: "Defeat your first boss.", check: s => s.lifetime.bossesDefeated >= 1 },
   { id: "boss_slain_5", name: "Veteran", desc: "Defeat 5 bosses total.", check: s => s.lifetime.bossesDefeated >= 5 },
   ...THEME_ACHIEVEMENTS,
-  { id: "full_set", name: "Suited Up", desc: "Own a complete 3-piece armor set.", check: s => ARMOR_SETS.some(set => armorPieceCount(s, set.key) >= 3) },
-  { id: "collector", name: "The Collector", desc: "Own every armor set in full.", check: s => ARMOR_SETS.every(set => armorPieceCount(s, set.key) >= 3) },
+  { id: "enemy_slain_1", name: "First Blood", desc: "Defeat a roaming enemy.", check: s => (s.lifetime.enemiesDefeated || 0) >= 1 },
+  { id: "enemy_slain_10", name: "Monster Hunter", desc: "Defeat 10 roaming enemies.", check: s => (s.lifetime.enemiesDefeated || 0) >= 10 },
   { id: "shard_100", name: "Modest Hoard", desc: "Hold 100 shards at once.", check: s => s.shards >= 100 },
   { id: "shard_500", name: "Dragon's Hoard", desc: "Hold 500 shards at once.", check: s => s.shards >= 500 },
   { id: "level_5_all", name: "Well-Rounded", desc: "Reach level 5 in every stat.", check: s => Object.values(s.stats).every(st => xpToLevel(st.xp) >= 5) },
@@ -275,63 +347,59 @@ function nextBoss(prevMaxHp, floor, namesPool) {
   return { name, hp: maxHp, maxHp, floor };
 }
 
-// ---------------- equipment math helpers ----------------
+// ---------------- equipment + combat math helpers ----------------
 function equippedLoadoutDefs(state) {
-  const ids = [state.loadout.weapon, state.loadout.acc1, state.loadout.acc2].filter(Boolean);
-  return ids.map(id => LOADOUT_ITEMS.find(i => i.id === id)).filter(Boolean);
-}
-function armorPieceCount(state, setKey) {
-  return state.armor.owned.filter(p => p.startsWith(setKey + ":")).length;
-}
-function equippedArmorSet(state) {
-  if (!state.armor.equippedSet) return null;
-  return ARMOR_SETS.find(a => a.key === state.armor.equippedSet) || null;
-}
-function activeArmorBonus(state) {
-  const set = equippedArmorSet(state);
-  if (!set) return null;
-  const count = armorPieceCount(state, set.key);
-  if (count >= 3) return { ...set.bonus3, tier: 3, set };
-  if (count >= 2) return { ...set.bonus2, tier: 2, set };
-  return null;
+  const ids = [state.loadout.weapon, state.loadout.helmet, state.loadout.chest, state.loadout.legs, state.loadout.acc1, state.loadout.acc2].filter(Boolean);
+  return ids.map(id => findPoolItem(id, state)).filter(Boolean);
 }
 function computeXpMult(state, cat) {
   let mult = 1;
-  equippedLoadoutDefs(state).forEach(item => { if (item.effect.xpMultAll) mult *= item.effect.xpMultAll; });
-  const b = activeArmorBonus(state);
-  if (b && b.set.stat === cat && b.xpMult) mult *= b.xpMult;
+  equippedLoadoutDefs(state).forEach(item => { if (item.effect && item.effect.xpMultAll) mult *= item.effect.xpMultAll; });
   return mult;
 }
 function computeShardMult(state) {
   let mult = 1;
-  equippedLoadoutDefs(state).forEach(item => { if (item.effect.shardMult) mult *= item.effect.shardMult; });
+  equippedLoadoutDefs(state).forEach(item => { if (item.effect && item.effect.shardMult) mult *= item.effect.shardMult; });
   return mult;
 }
 function hasLootBoost(state) {
-  if (equippedLoadoutDefs(state).some(i => i.effect.lootBoost)) return true;
-  const b = activeArmorBonus(state);
-  return !!(b && b.lootBoost);
+  return equippedLoadoutDefs(state).some(i => i.effect && i.effect.lootBoost);
 }
 function forkChanceMult(state) {
   let mult = 1;
-  equippedLoadoutDefs(state).forEach(i => { if (i.effect.forkMult) mult *= i.effect.forkMult; });
-  const b = activeArmorBonus(state); if (b && b.forkMult) mult *= b.forkMult;
+  equippedLoadoutDefs(state).forEach(i => { if (i.effect && i.effect.forkMult) mult *= i.effect.forkMult; });
   return mult;
 }
 function bossDmgMult(state) {
   let mult = 1;
-  equippedLoadoutDefs(state).forEach(i => { if (i.effect.bossDmgMult) mult *= i.effect.bossDmgMult; });
+  equippedLoadoutDefs(state).forEach(i => { if (i.effect && i.effect.bossDmgMult) mult *= i.effect.bossDmgMult; });
   return mult;
 }
-function hasNoCurse(state) { return equippedLoadoutDefs(state).some(i => i.effect.noCurse); }
-function curseCap(state) { const b = activeArmorBonus(state); return (b && b.curseCap) ? b.curseCap : 3; }
-function vaultDiscountMult(state) { const item = equippedLoadoutDefs(state).find(i => i.effect.vaultDiscount); return item ? item.effect.vaultDiscount : 1; }
-function momentumBonus(state) { const item = equippedLoadoutDefs(state).find(i => i.effect.momentum); return item ? item.effect.momentum : 0; }
-function doubleBossChance(state) { const item = equippedLoadoutDefs(state).find(i => i.effect.doubleBossChance); return item ? item.effect.doubleBossChance : 0; }
-function stretchBossMult(state) { const item = equippedLoadoutDefs(state).find(i => i.effect.stretchBossMult); return item ? item.effect.stretchBossMult : 1; }
-function armorFlatShardBonus(state, cat) { const b = activeArmorBonus(state); return (b && b.set.stat === cat && b.flatShardBonus) ? b.flatShardBonus : 0; }
-function armorDoubleLootChance(state, cat) { const b = activeArmorBonus(state); return (b && b.set.stat === cat && b.doubleLootChance) ? b.doubleLootChance : 0; }
-function armorBossChip(state, cat) { const b = activeArmorBonus(state); return (b && b.set.stat === cat && b.bossChip) ? b.bossChip : 0; }
+function hasNoCurse(state) { return equippedLoadoutDefs(state).some(i => i.effect && i.effect.noCurse); }
+function vaultDiscountMult(state) { const item = equippedLoadoutDefs(state).find(i => i.effect && i.effect.vaultDiscount); return item ? item.effect.vaultDiscount : 1; }
+function momentumBonus(state) { const item = equippedLoadoutDefs(state).find(i => i.effect && i.effect.momentum); return item ? item.effect.momentum : 0; }
+function doubleBossChance(state) { const item = equippedLoadoutDefs(state).find(i => i.effect && i.effect.doubleBossChance); return item ? item.effect.doubleBossChance : 0; }
+function stretchBossMult(state) { const item = equippedLoadoutDefs(state).find(i => i.effect && i.effect.stretchBossMult); return item ? item.effect.stretchBossMult : 1; }
+
+function charLevelOf(state) {
+  return Math.floor(Object.values(state.stats).reduce((a, s) => a + xpToLevel(s.xp), 0) / Object.keys(STATS).length);
+}
+function computeAttack(state) {
+  let atk = 4 + xpToLevel(state.stats.body.xp) * 2;
+  equippedLoadoutDefs(state).forEach(i => { if (i.atk) atk += i.atk; });
+  return atk;
+}
+function computeDefense(state) {
+  let def = 4 + xpToLevel(state.stats.order.xp) * 2;
+  equippedLoadoutDefs(state).forEach(i => { if (i.def) def += i.def; });
+  return def;
+}
+function computeMaxHealth(state) {
+  let hp = 60 + charLevelOf(state) * 8;
+  equippedLoadoutDefs(state).forEach(i => { if (i.health) hp += i.health; });
+  return hp;
+}
+function clamp(n, lo, hi) { return Math.max(lo, Math.min(hi, n)); }
 
 function checkAchievements(s) {
   const newly = [];
@@ -386,13 +454,15 @@ const defaultState = () => ({
   sigil: SIGILS[6], wheel: { date: null, challenge: null, done: false },
   dailyQuests: [], pool: DEFAULT_POOL, bonusPool: BONUS_POOL,
   sideQuests: [], vault: DEFAULT_VAULT, lootLog: [],
-  pendingFork: null,
+  pendingFork: null, pendingEnemy: null,
   boss: { name: "", hp: 0, maxHp: 0, floor: 1 },
   run: { weekKey: null, theme: null, questsDone: 0, transition: null, scaledStart: false },
-  loadout: { weapon: null, acc1: null, acc2: null }, ownedLoadout: [],
-  armor: { equippedSet: null, owned: [] },
-  seenThemes: [], clearedThemes: [], unlockedSkins: [], activeSkin: null,
-  achievements: [], lifetime: { questsDone: 0, bossesDefeated: 0 },
+  loadout: { weapon: null, helmet: null, chest: null, legs: null, acc1: null, acc2: null }, ownedLoadout: [],
+  health: { current: 100 },
+  shop: { date: null, stock: [], rerollsUsed: 0 },
+  dailyBonus: { date: null, claimed: false },
+  clearedThemes: [], unlockedSkins: [], activeSkin: null,
+  achievements: [], lifetime: { questsDone: 0, bossesDefeated: 0, enemiesDefeated: 0 },
 });
 
 // ---------------- shared style bits (theme-driven materials) ----------------
@@ -463,9 +533,14 @@ function TheLedger() {
         } catch (e) { /* first run */ }
       }
       if (!s.run) s.run = defaultState().run;
-      if (!s.loadout) s.loadout = defaultState().loadout;
-      if (!s.armor) s.armor = defaultState().armor;
+      s.loadout = { ...defaultState().loadout, ...s.loadout };
       if (!s.lifetime) s.lifetime = defaultState().lifetime;
+      if (s.lifetime.enemiesDefeated === undefined) s.lifetime.enemiesDefeated = 0;
+      if (!s.health) s.health = defaultState().health;
+      if (!s.shop) s.shop = defaultState().shop;
+      if (!s.dailyBonus) s.dailyBonus = defaultState().dailyBonus;
+      if (s.pendingEnemy === undefined) s.pendingEnemy = null;
+      delete s.armor; delete s.seenThemes;
 
       // migrate off retired stat categories (Bond/Path removed)
       s.stats = Object.fromEntries(Object.keys(STATS).map(k => [k, s.stats[k] || { xp: 0 }]));
@@ -475,17 +550,7 @@ function TheLedger() {
       s.bonusPool = s.bonusPool.filter(q => STATS[q.cat]);
       if (s.wheel.challenge && !STATS[s.wheel.challenge.cat]) s.wheel = { date: null, challenge: null, done: false };
 
-      if (s.lastOpen !== todayStr()) {
-        const missed = s.lastOpen && s.dailyQuests.some(q => q.stage !== "done");
-        if (missed && !hasNoCurse(s)) s.staticMeter = Math.min(s.staticMeter + 1, curseCap(s));
-        else if (!missed) s.staticMeter = Math.max(s.staticMeter - 1, 0);
-        s.streak = missed ? 0 : s.streak;
-        s.sigil = SIGILS[Math.floor(Math.random() * SIGILS.length)];
-        s.dailyQuests = drawDailyQuests(s.pool, s.stats);
-        s.wheel = { date: todayStr(), challenge: null, done: false };
-        s.lastOpen = todayStr();
-      }
-
+      // weekly run/theme resolution (must happen before daily reset, since shop/enemies are theme-flavored)
       const wk = mondayKey(new Date());
       if (!s.run.weekKey) {
         const theme = pickTheme(null);
@@ -496,13 +561,38 @@ function TheLedger() {
         const hp = Math.max(120, Math.round(BASE_BOSS_HP * remaining / 6));
         s.run = { weekKey: wk, theme: theme.key, questsDone: 0, transition: null, scaledStart: scaled };
         s.boss = { name: theme.bossNames[0], hp, maxHp: hp, floor: 1 };
-        if (!s.seenThemes.includes(theme.key)) s.seenThemes.push(theme.key);
       } else if (s.run.weekKey !== wk && !s.run.transition) {
         const oldTheme = THEMES.find(t => t.key === s.run.theme) || THEMES[0];
         const result = s.boss.hp <= 0 ? "victory" : "escaped";
         s.run.transition = { oldThemeName: oldTheme.name, oldThemeKey: oldTheme.key, result, questsDone: s.run.questsDone, ownedLoadout: [...s.ownedLoadout] };
       }
-      if (s.run.theme && !s.seenThemes.includes(s.run.theme)) s.seenThemes.push(s.run.theme);
+      s.health.current = Math.min(s.health.current, computeMaxHealth(s));
+
+      if (s.lastOpen !== todayStr()) {
+        const missed = s.lastOpen && s.dailyQuests.some(q => q.stage !== "done");
+        if (missed && !hasNoCurse(s)) {
+          s.staticMeter = Math.min(s.staticMeter + 1, 3);
+          s.health.current = Math.max(0, s.health.current - 15);
+        } else if (!missed) {
+          s.staticMeter = Math.max(s.staticMeter - 1, 0);
+        }
+        s.streak = missed ? 0 : s.streak;
+        s.sigil = SIGILS[Math.floor(Math.random() * SIGILS.length)];
+        s.dailyQuests = drawDailyQuests(s.pool, s.stats);
+        s.wheel = { date: todayStr(), challenge: null, done: false };
+        s.lastOpen = todayStr();
+        s.dailyBonus = { date: todayStr(), claimed: false };
+
+        const liveTheme = THEMES.find(t => t.key === s.run.theme) || THEMES[0];
+        const pool = allPoolItems(s);
+        s.shop = { date: todayStr(), stock: pool.sort(() => Math.random() - 0.5).slice(0, 4).map(i => i.id), rerollsUsed: 0 };
+        if (!s.pendingEnemy) s.pendingEnemy = rollEnemy(liveTheme, charLevelOf(s));
+      }
+
+      if (s.health.current <= 0 && !s.run.transition) {
+        const liveTheme = THEMES.find(t => t.key === s.run.theme) || THEMES[0];
+        s.run.transition = { oldThemeName: liveTheme.name, oldThemeKey: liveTheme.key, result: "defeated", questsDone: s.run.questsDone, ownedLoadout: [...s.ownedLoadout] };
+      }
 
       setState(s);
       setLoaded(true);
@@ -549,8 +639,9 @@ function TheLedger() {
     setState(prev => {
       const s = structuredClone(prev);
       const q = s.dailyQuests.find(x => x.uid === u);
-      if (!q || q.stage === "done") return prev;
+      if (!q || (q.stage === "done" && (!stretch || q.pushed))) return prev;
       q.stage = "done";
+      if (stretch) q.pushed = true;
       const sigilMult = (s.sigil.stat === q.cat) ? s.sigil.mult : 1;
       const gearMult = computeXpMult(s, q.cat);
       let xpGain = Math.round(q.xp * sigilMult * gearMult);
@@ -559,15 +650,15 @@ function TheLedger() {
       const boosted = (s.sigil.stat === "loot") || stretch || hasLootBoost(s);
       const loot = rollRarity(boosted);
       let shardGain = Math.round(loot.shards * computeShardMult(s));
-      shardGain += armorFlatShardBonus(s, q.cat);
       const doneSoFar = s.dailyQuests.filter(x => x.stage === "done").length;
       if (doneSoFar > 1) shardGain += momentumBonus(s);
-      if (Math.random() < armorDoubleLootChance(s, q.cat)) shardGain *= 2;
       s.shards += shardGain;
 
-      let bossDmg = Math.round(xpGain * 0.6 * bossDmgMult(s));
+      if (q.cat === "body") s.health.current = Math.min(computeMaxHealth(s), s.health.current + 3);
+
+      const attack = computeAttack(s);
+      let bossDmg = Math.round((xpGain * 0.4 + attack * 1.5) * bossDmgMult(s));
       if (stretch) bossDmg = Math.round(bossDmg * stretchBossMult(s));
-      bossDmg += armorBossChip(s, q.cat);
       if (Math.random() < doubleBossChance(s)) bossDmg *= 2;
       s.boss.hp = Math.max(0, s.boss.hp - bossDmg);
 
@@ -599,14 +690,48 @@ function TheLedger() {
         showToast(`+${xpGain} XP · ${shardGain} shards (${loot.rarity})`, loot.color);
       }
 
-      if (!stretch && !s.pendingFork && Math.random() < FORK_CHANCE * forkChanceMult(s)) {
+      if (!stretch && !s.pendingFork && !s.pendingEnemy && Math.random() < FORK_CHANCE * forkChanceMult(s)) {
         s.pendingFork = { id: uid(), prompt: FORK_PROMPTS[Math.floor(Math.random() * FORK_PROMPTS.length)], safeAmt: 6, riskWin: 18 };
+      } else if (!stretch && !s.pendingFork && !s.pendingEnemy && Math.random() < 0.12) {
+        s.pendingEnemy = rollEnemy(theme, charLevelOf(s));
       }
       const newly = checkAchievements(s);
       if (newly.length) setTimeout(() => showToast(`🏆 Trophy: ${newly[0].name}`, "#CB9A3E"), 400);
       return s;
     });
   };
+
+  const fightEnemy = () => {
+    setState(prev => {
+      if (!prev.pendingEnemy) return prev;
+      const s = structuredClone(prev);
+      const enemy = s.pendingEnemy;
+      s.pendingEnemy = null;
+      const attack = computeAttack(s);
+      const winChance = clamp(0.5 + (attack - enemy.power) / 30, 0.15, 0.92);
+      if (Math.random() < winChance) {
+        s.shards += enemy.reward;
+        s.lifetime.enemiesDefeated = (s.lifetime.enemiesDefeated || 0) + 1;
+        if (Math.random() < 0.12) s.health.current = Math.max(0, s.health.current - (2 + Math.floor(Math.random() * 4)));
+        s.lootLog.unshift({ id: uid(), text: `Defeated ${enemy.name}!`, rarity: "uncommon", color: "#4C8A57", shards: enemy.reward, xp: 0, at: Date.now() });
+        showToast(`${enemy.name} defeated! +${enemy.reward} shards`, "#4C8A57");
+        const newly = checkAchievements(s);
+        if (newly.length) setTimeout(() => showToast(`🏆 Trophy: ${newly[0].name}`, "#CB9A3E"), 400);
+      } else {
+        const dmg = 10 + Math.floor(Math.random() * 8);
+        s.health.current = Math.max(0, s.health.current - dmg);
+        s.lootLog.unshift({ id: uid(), text: `Lost to ${enemy.name} — took ${dmg} damage`, rarity: "common", color: "#8e2b2b", shards: 0, xp: 0, at: Date.now() });
+        showToast(`${enemy.name} got the better of you. -${dmg} HP`, "#8e2b2b");
+      }
+      if (s.health.current <= 0 && !s.run.transition) {
+        const theme = THEMES.find(t => t.key === s.run.theme) || THEMES[0];
+        s.run.transition = { oldThemeName: theme.name, oldThemeKey: theme.key, result: "defeated", questsDone: s.run.questsDone, ownedLoadout: [...s.ownedLoadout] };
+      }
+      return s;
+    });
+  };
+
+  const fleeEnemy = () => setState(prev => ({ ...prev, pendingEnemy: null }));
 
   const resolveFork = (choice) => {
     setState(prev => {
@@ -740,10 +865,11 @@ function TheLedger() {
       rolls.forEach(r => { shardGain += r.shards; });
       s.shards += shardGain;
 
-      let bossDmg = Math.round(xpGain * 0.6 * bossDmgMult(s));
-      bossDmg += armorBossChip(s, q.cat);
+      const attack = computeAttack(s);
+      let bossDmg = Math.round((xpGain * 0.4 + attack * 1.5) * bossDmgMult(s));
       if (Math.random() < doubleBossChance(s)) bossDmg *= 2;
       s.boss.hp = Math.max(0, s.boss.hp - bossDmg);
+      if (q.cat === "body") s.health.current = Math.min(computeMaxHealth(s), s.health.current + 3);
       const theme = THEMES.find(t => t.key === s.run.theme) || THEMES[0];
       if (s.boss.hp <= 0) {
         const clearedFloor = s.boss.floor;
@@ -783,37 +909,44 @@ function TheLedger() {
 
   const buyLoadoutItem = (id) => {
     setState(prev => {
-      const def = LOADOUT_ITEMS.find(i => i.id === id);
+      const def = findPoolItem(id, prev);
       if (!def || prev.ownedLoadout.includes(id)) return prev;
       if (prev.shards < def.cost) { showToast("Not enough shards", "#8e2b2b"); return prev; }
-      showToast(`Acquired: ${def.name}`, "#CB9A3E");
-      return { ...prev, shards: prev.shards - def.cost, ownedLoadout: [...prev.ownedLoadout, id] };
-    });
-  };
-  const equipLoadout = (slot, itemId) => setState(prev => ({ ...prev, loadout: { ...prev.loadout, [slot]: itemId } }));
-
-  const buyArmorPiece = (setKey, slotName) => {
-    setState(prev => {
-      const set = ARMOR_SETS.find(a => a.key === setKey);
-      const pieceKey = `${setKey}:${slotName}`;
-      if (!set || prev.armor.owned.includes(pieceKey)) return prev;
-      if (!prev.seenThemes.includes(setKey)) { showToast("Not yet discovered — experience that theme first", "#8e2b2b"); return prev; }
-      if (prev.shards < set.cost) { showToast("Not enough shards", "#8e2b2b"); return prev; }
       const s = structuredClone(prev);
-      s.shards -= set.cost;
-      s.armor.owned.push(pieceKey);
-      if (!s.armor.equippedSet) s.armor.equippedSet = setKey;
-      const newly = checkAchievements(s);
-      showToast(`Acquired: ${set.pieces[slotName]}`, "#CB9A3E");
-      if (newly.length) setTimeout(() => showToast(`🏆 Trophy: ${newly[0].name}`, "#CB9A3E"), 500);
+      s.shards -= def.cost;
+      s.ownedLoadout.push(id);
+      if (def.slot === "accessory") {
+        if (!s.loadout.acc1) s.loadout.acc1 = id;
+        else if (!s.loadout.acc2) s.loadout.acc2 = id;
+      } else if (!s.loadout[def.slot]) {
+        s.loadout[def.slot] = id;
+      }
+      showToast(`Acquired: ${def.name}`, "#CB9A3E");
       return s;
     });
   };
-  const equipArmorSet = (setKey) => setState(prev => ({ ...prev, armor: { ...prev.armor, equippedSet: setKey } }));
+  const equipItem = (id) => {
+    setState(prev => {
+      const def = findPoolItem(id, prev);
+      if (!def) return prev;
+      const s = structuredClone(prev);
+      if (def.slot === "accessory") {
+        if (s.loadout.acc1 === id || s.loadout.acc2 === id) return prev;
+        if (!s.loadout.acc1) s.loadout.acc1 = id;
+        else if (!s.loadout.acc2) s.loadout.acc2 = id;
+        else s.loadout.acc2 = id;
+      } else {
+        s.loadout[def.slot] = id;
+      }
+      return s;
+    });
+  };
+  const unequipSlot = (slot) => setState(prev => ({ ...prev, loadout: { ...prev.loadout, [slot]: null } }));
 
   const confirmTransition = (keepsakeId) => {
     setState(prev => {
       if (!prev.run.transition) return prev;
+      const def = keepsakeId ? findPoolItem(keepsakeId, prev) : null;
       const s = structuredClone(prev);
       if (s.run.transition.result === "victory") {
         const key = s.run.transition.oldThemeKey;
@@ -823,13 +956,38 @@ function TheLedger() {
       const nextTheme = pickTheme(s.run.theme);
       s.boss = { name: nextTheme.bossNames[0], hp: BASE_BOSS_HP, maxHp: BASE_BOSS_HP, floor: 1 };
       s.run = { weekKey: mondayKey(new Date()), theme: nextTheme.key, questsDone: 0, transition: null, scaledStart: false };
-      if (!s.seenThemes.includes(nextTheme.key)) s.seenThemes.push(nextTheme.key);
-      const def = keepsakeId ? LOADOUT_ITEMS.find(i => i.id === keepsakeId) : null;
       s.ownedLoadout = def ? [def.id] : [];
-      s.loadout = def ? (def.slot === "weapon" ? { weapon: def.id, acc1: null, acc2: null } : { weapon: null, acc1: def.id, acc2: null }) : { weapon: null, acc1: null, acc2: null };
+      s.loadout = { weapon: null, helmet: null, chest: null, legs: null, acc1: null, acc2: null };
+      if (def) {
+        if (def.slot === "accessory") s.loadout.acc1 = def.id;
+        else s.loadout[def.slot] = def.id;
+      }
+      s.health = { current: computeMaxHealth(s) };
+      s.pendingFork = null;
+      s.pendingEnemy = null;
       checkAchievements(s);
       showToast(`A new tale begins: ${nextTheme.name}`, nextTheme.accent);
       return s;
+    });
+  };
+
+  const claimDailyBonus = () => {
+    setState(prev => {
+      if (prev.dailyBonus.claimed && prev.dailyBonus.date === todayStr()) return prev;
+      const amount = 6 + Math.floor(Math.random() * 6);
+      showToast(`Daily bonus claimed: +${amount} shards`, "#CB9A3E");
+      return { ...prev, shards: prev.shards + amount, dailyBonus: { date: todayStr(), claimed: true } };
+    });
+  };
+
+  const rerollShop = () => {
+    setState(prev => {
+      const cost = 8 * (prev.shop.rerollsUsed + 1);
+      if (prev.shards < cost) { showToast("Not enough shards to reroll", "#8e2b2b"); return prev; }
+      const pool = allPoolItems(prev);
+      const stock = pool.sort(() => Math.random() - 0.5).slice(0, 4).map(i => i.id);
+      showToast("Shop restocked", "#CB9A3E");
+      return { ...prev, shards: prev.shards - cost, shop: { date: todayStr(), stock, rerollsUsed: prev.shop.rerollsUsed + 1 } };
     });
   };
 
@@ -888,7 +1046,10 @@ function TheLedger() {
   const dow = new Date().getDay();
   const dayLabel = DAY_LABELS[dow];
   const daysUntilBoss = dow === 0 ? 6 : Math.max(0, 6 - dow);
-  const equippedArmor = activeArmorBonus(state);
+  const maxHealth = computeMaxHealth(state);
+  const healthPct = maxHealth ? state.health.current / maxHealth : 1;
+  const attackStat = computeAttack(state);
+  const defenseStat = computeDefense(state);
 
   return (
     <div style={{ minHeight: "100vh", background: `radial-gradient(ellipse at top, ${theme.accent}26 0%, transparent 45%), radial-gradient(ellipse at top, ${theme.pageBg[0]} 0%, ${theme.pageBg[1]} 55%, ${theme.pageBg[2]} 100%)`, color: "#f1e2bd", fontFamily: "'Nunito', system-ui, sans-serif", paddingBottom: "80px", transition: "background 0.4s ease" }}>
@@ -926,22 +1087,23 @@ function TheLedger() {
         <div style={{ position: "fixed", inset: 0, background: "rgba(10,7,4,0.9)", zIndex: 50, display: "flex", alignItems: "center", justifyContent: "center", padding: "20px" }}>
           <div style={{ maxWidth: "460px", width: "100%", ...plaque, padding: "20px", maxHeight: "85vh", overflowY: "auto", animation: "popIn .2s ease" }}>
             <div className="disp" style={{ fontSize: "22px", color: theme.accent, marginBottom: "6px" }}>
-              {state.run.transition.result === "victory" ? "Victory!" : "The Boss Slips Away…"}
+              {state.run.transition.result === "victory" ? "Victory!" : state.run.transition.result === "defeated" ? "You Fall…" : "The Boss Slips Away…"}
             </div>
             <div style={{ fontSize: "13px", color: "#d8c9a3", marginBottom: "14px" }}>
               {state.run.transition.oldThemeName} has ended — {state.run.transition.questsDone} quests completed this run.
               {state.run.transition.result === "victory" && " A cosmetic skin for this theme is now unlocked forever."}
+              {state.run.transition.result === "defeated" && " Health hit zero — the run ends here, but you rise again with a full slate."}
             </div>
             {state.run.transition.ownedLoadout.length > 0 ? (
               <>
                 <div className="mono" style={{ fontSize: "11px", color: "#b9ac8c", marginBottom: "8px" }}>CHOOSE ONE KEEPSAKE TO CARRY FORWARD</div>
                 <div style={{ display: "flex", flexDirection: "column", gap: "8px", marginBottom: "14px" }}>
                   {state.run.transition.ownedLoadout.map(iid => {
-                    const def = LOADOUT_ITEMS.find(i => i.id === iid);
+                    const def = findPoolItem(iid, state);
                     if (!def) return null;
                     return (
                       <div key={iid} className="btn lift" onClick={() => confirmTransition(iid)} style={{ padding: "10px", ...parchment, display: "flex", alignItems: "center", gap: "10px" }}>
-                        <div style={badge(theme.accent)}><Icon name={def.icon} size={14} color={theme.accent} /></div>
+                        <div style={badge(theme.accent)}><Sprite name={def.sprite} tint={theme.accent} size={3} /></div>
                         <div style={{ flex: 1 }}>
                           <div style={{ fontWeight: 700, fontSize: "13px" }}>{def.name}</div>
                           <div className="mono" style={{ fontSize: "10px", color: "#7a6440" }}>{def.desc}</div>
@@ -1013,10 +1175,18 @@ function TheLedger() {
           <div style={{ fontSize: "10px", letterSpacing: "1.5px", color: "#b9ac8c" }} className="mono">TODAY'S OMEN</div>
           <div style={{ fontSize: "13px", color: theme.accent, marginTop: "2px" }}>{state.sigil.text}</div>
         </div>
-        {equippedArmor && (
-          <div style={{ marginTop: "8px", fontSize: "11px", color: "#c9b17a" }} className="mono">
-            {equippedArmor.set.name} ({equippedArmor.tier}/3): {equippedArmor.label}
+        <div style={{ marginTop: "10px", padding: "10px 12px", borderRadius: "8px", ...plaque }}>
+          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "4px" }}>
+            <span className="mono" style={{ fontSize: "10px", color: "#b9ac8c" }}>HEALTH</span>
+            <span className="mono" style={{ fontSize: "10px", color: "#f1e2bd" }}>{state.health.current}/{maxHealth}</span>
           </div>
+          <div style={{ height: "8px", background: "#3a2a1a", borderRadius: "4px", overflow: "hidden", border: "1px solid #6b4a26" }}>
+            <div style={{ width: `${clamp((state.health.current / maxHealth) * 100, 0, 100)}%`, height: "100%", background: healthPct > 0.4 ? "linear-gradient(90deg,#4C8A57,#4C8A57cc)" : "linear-gradient(90deg,#b0453f,#8e2b2bcc)", transition: "width .4s" }} />
+          </div>
+          <div className="mono" style={{ fontSize: "10px", color: "#b9ac8c", marginTop: "6px" }}>⚔ Attack {attackStat} · 🛡 Defense {defenseStat}</div>
+        </div>
+        {!(state.dailyBonus.claimed && state.dailyBonus.date === todayStr()) && (
+          <div className="btn btn3d" onClick={claimDailyBonus} style={{ ...btnPrimary, marginTop: "10px", textAlign: "center" }}>Claim daily bonus 🎁</div>
         )}
         {state.run.scaledStart && (
           <div style={{ marginTop: "8px", fontSize: "11px", color: "#8fbf98" }} className="mono">
@@ -1104,6 +1274,19 @@ function TheLedger() {
                 </div>
               </div>
             )}
+            {state.pendingEnemy && (
+              <div style={{ padding: "12px", borderRadius: "10px", background: "linear-gradient(160deg, #3a1a1a, #251010)", border: "2px solid #b0453f", color: "#f0d6d3", animation: "popIn .2s ease", display: "flex", alignItems: "center", gap: "10px" }}>
+                <Sprite name={state.pendingEnemy.sprite} size={4} />
+                <div style={{ flex: 1 }}>
+                  <div style={{ fontWeight: 800 }}>{state.pendingEnemy.name} appears!</div>
+                  <div className="mono" style={{ fontSize: "10px", color: "#d3a8a3" }}>power {state.pendingEnemy.power} · your attack {computeAttack(state)} · win reward {state.pendingEnemy.reward} shards</div>
+                  <div style={{ display: "flex", gap: "8px", marginTop: "8px", flexWrap: "wrap" }}>
+                    <div className="btn btn3d" onClick={fightEnemy} style={{ ...btnPrimary, background: "linear-gradient(180deg, #b0453f, #7a2b26)", boxShadow: "0 3px 0 #501a17" }}>Fight</div>
+                    <div className="btn" onClick={fleeEnemy} style={{ ...btnGhost, color: "#f0d6d3", borderColor: "#b0453f" }}>Flee</div>
+                  </div>
+                </div>
+              </div>
+            )}
             {state.dailyQuests.length === 0 && <div style={{ color: "#8a7550", fontSize: "13px" }}>No quests drawn — add some in Edit Pool.</div>}
             {state.dailyQuests.map(q => {
               const def = STATS[q.cat] || STATS.craft;
@@ -1126,7 +1309,7 @@ function TheLedger() {
                     {q.stage === "ignited" && (
                       <div className="btn btn3d" onClick={() => completeQuest(q.uid)} style={{ ...btnPrimary, padding: "6px 8px", fontSize: "11px" }}>Finish it</div>
                     )}
-                    {q.stage === "done" && (
+                    {q.stage === "done" && !q.pushed && (
                       <div className="btn" onClick={() => completeQuest(q.uid, true)} style={{ ...btnGhost, padding: "6px 8px", fontSize: "10px" }}>Push further</div>
                     )}
                   </div>
@@ -1207,51 +1390,19 @@ function TheLedger() {
         {tab === "gear" && (
           <div style={{ display: "flex", flexDirection: "column", gap: "16px" }}>
             <div>
-              <div className="mono" style={{ fontSize: "11px", letterSpacing: "1px", color: "#b9ac8c", marginBottom: "8px" }}>LOADOUT — weekly, wiped except one keepsake</div>
-              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: "8px", marginBottom: "10px" }}>
-                {["weapon", "acc1", "acc2"].map(slot => {
-                  const itemId = state.loadout[slot];
-                  const def = itemId ? LOADOUT_ITEMS.find(i => i.id === itemId) : null;
-                  return (
-                    <div key={slot} style={{ padding: "8px", ...parchment, textAlign: "center" }}>
-                      <div className="mono" style={{ fontSize: "9px", color: "#7a6440" }}>{slot === "weapon" ? "WEAPON" : "ACCESSORY"}</div>
-                      {def ? (
-                        <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: "4px", marginTop: "4px" }}>
-                          <Icon name={def.icon} size={16} color={theme.accent} />
-                          <div style={{ fontSize: "10px", fontWeight: 700 }}>{def.name}</div>
-                        </div>
-                      ) : <div style={{ fontSize: "10px", color: "#a89264", marginTop: "8px" }}>empty</div>}
-                    </div>
-                  );
-                })}
+              <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: "8px" }}>
+                <div className="mono" style={{ fontSize: "11px", letterSpacing: "1px", color: "#b9ac8c" }}>TODAY'S SHOP</div>
+                <div className="btn" onClick={rerollShop} style={{ ...btnGhost, padding: "4px 8px", fontSize: "10px" }}>Reroll ({8 * (state.shop.rerollsUsed + 1)} <Icon name="gem" size={9} color="#5a4326" style={{ verticalAlign: "-1px" }} />)</div>
               </div>
-              {state.ownedLoadout.length > 0 && (
-                <div style={{ marginBottom: "10px" }}>
-                  <div className="mono" style={{ fontSize: "10px", color: "#b9ac8c", marginBottom: "6px" }}>OWNED — tap to equip</div>
-                  <div style={{ display: "flex", flexWrap: "wrap", gap: "6px" }}>
-                    {state.ownedLoadout.map(id => {
-                      const def = LOADOUT_ITEMS.find(i => i.id === id);
-                      if (!def) return null;
-                      const slotKey = def.slot === "weapon" ? "weapon" : (state.loadout.acc1 === id || state.loadout.acc1 === null ? "acc1" : "acc2");
-                      const equipped = state.loadout.weapon === id || state.loadout.acc1 === id || state.loadout.acc2 === id;
-                      return (
-                        <div key={id} className="btn" onClick={() => equipLoadout(def.slot === "weapon" ? "weapon" : (state.loadout.acc1 === id ? "acc1" : (state.loadout.acc2 === id ? "acc2" : (state.loadout.acc1 ? "acc2" : "acc1"))), id)}
-                          style={{ ...btnGhost, borderColor: equipped ? theme.accent : "#b3925a", color: equipped ? theme.accent : "#5a4326", padding: "5px 9px" }}>
-                          {def.name}{equipped ? " ✓" : ""}
-                        </div>
-                      );
-                    })}
-                  </div>
-                </div>
-              )}
-              <div className="mono" style={{ fontSize: "10px", color: "#b9ac8c", marginBottom: "6px" }}>SHOP</div>
-              <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
-                {LOADOUT_ITEMS.map(item => {
+              <div style={{ display: "flex", flexDirection: "column", gap: "8px", marginBottom: "16px" }}>
+                {state.shop.stock.map(id => {
+                  const item = findPoolItem(id, state);
+                  if (!item) return null;
                   const owned = state.ownedLoadout.includes(item.id);
                   const affordable = state.shards >= item.cost;
                   return (
                     <div key={item.id} className="lift" style={{ padding: "10px", display: "flex", alignItems: "center", gap: "10px", ...parchment, opacity: owned ? 0.6 : 1 }}>
-                      <div style={badge(theme.accent)}><Icon name={item.icon} size={14} color={theme.accent} /></div>
+                      <div style={badge(theme.accent)}><Sprite name={item.sprite} tint={theme.accent} size={3} /></div>
                       <div style={{ flex: 1 }}>
                         <div style={{ fontSize: "12px", fontWeight: 700 }}>{item.name} <span className="mono" style={{ fontSize: "9px", color: "#7a6440" }}>({item.slot})</span></div>
                         <div className="mono" style={{ fontSize: "10px", color: "#7a6440" }}>{item.desc}</div>
@@ -1263,45 +1414,64 @@ function TheLedger() {
                   );
                 })}
               </div>
-            </div>
 
-            <div>
-              <div className="mono" style={{ fontSize: "11px", letterSpacing: "1px", color: "#b9ac8c", marginBottom: "8px" }}>ARMOR — permanent, set-bonus focused</div>
-              {ARMOR_SETS.map(set => {
-                const count = armorPieceCount(state, set.key);
-                const unlocked = state.seenThemes.includes(set.key);
-                const equipped = state.armor.equippedSet === set.key;
-                const statColor = STATS[set.stat].color;
-                return (
-                  <div key={set.key} className="lift" style={{ padding: "12px", marginBottom: "8px", ...parchment, opacity: unlocked ? 1 : 0.5 }}>
-                    <div style={{ display: "flex", alignItems: "center", gap: "8px", marginBottom: "6px" }}>
-                      <div style={badge(statColor)}><Icon name="helmet" size={14} color={statColor} /></div>
+              <div className="mono" style={{ fontSize: "11px", letterSpacing: "1px", color: "#b9ac8c", marginBottom: "8px" }}>LOADOUT — weekly, wiped except one keepsake</div>
+              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: "8px", marginBottom: "10px" }}>
+                {["weapon", "helmet", "chest", "legs", "acc1", "acc2"].map(slot => {
+                  const itemId = state.loadout[slot];
+                  const def = itemId ? findPoolItem(itemId, state) : null;
+                  const label = slot === "weapon" ? "WEAPON" : slot === "acc1" || slot === "acc2" ? "ACCESSORY" : slot.toUpperCase();
+                  return (
+                    <div key={slot} className="btn" onClick={() => def && unequipSlot(slot)} style={{ padding: "8px", ...parchment, textAlign: "center" }}>
+                      <div className="mono" style={{ fontSize: "9px", color: "#7a6440" }}>{label}</div>
+                      {def ? (
+                        <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: "4px", marginTop: "4px" }}>
+                          <Sprite name={def.sprite} tint={theme.accent} size={3} />
+                          <div style={{ fontSize: "9px", fontWeight: 700 }}>{def.name}</div>
+                        </div>
+                      ) : <div style={{ fontSize: "10px", color: "#a89264", marginTop: "8px" }}>empty</div>}
+                    </div>
+                  );
+                })}
+              </div>
+              {state.ownedLoadout.length > 0 && (
+                <div style={{ marginBottom: "10px" }}>
+                  <div className="mono" style={{ fontSize: "10px", color: "#b9ac8c", marginBottom: "6px" }}>OWNED — tap to equip</div>
+                  <div style={{ display: "flex", flexWrap: "wrap", gap: "6px" }}>
+                    {state.ownedLoadout.map(id => {
+                      const def = findPoolItem(id, state);
+                      if (!def) return null;
+                      const equipped = Object.values(state.loadout).includes(id);
+                      return (
+                        <div key={id} className="btn" onClick={() => equipItem(id)}
+                          style={{ ...btnGhost, borderColor: equipped ? theme.accent : "#b3925a", color: equipped ? theme.accent : "#5a4326", padding: "5px 9px" }}>
+                          {def.name}{equipped ? " ✓" : ""}
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
+              )}
+
+              <div className="mono" style={{ fontSize: "10px", color: "#b9ac8c", marginBottom: "6px" }}>FULL CATALOG</div>
+              <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
+                {allPoolItems(state).map(item => {
+                  const owned = state.ownedLoadout.includes(item.id);
+                  const affordable = state.shards >= item.cost;
+                  return (
+                    <div key={item.id} className="lift" style={{ padding: "10px", display: "flex", alignItems: "center", gap: "10px", ...parchment, opacity: owned ? 0.6 : 1 }}>
+                      <div style={badge(theme.accent)}><Sprite name={item.sprite} tint={theme.accent} size={3} /></div>
                       <div style={{ flex: 1 }}>
-                        <div style={{ fontSize: "13px", fontWeight: 700 }}>{set.name}</div>
-                        <div className="mono" style={{ fontSize: "9px", color: "#7a6440" }}>{STATS[set.stat].label} set · {count}/3 owned</div>
+                        <div style={{ fontSize: "12px", fontWeight: 700 }}>{item.name} <span className="mono" style={{ fontSize: "9px", color: "#7a6440" }}>({item.slot})</span></div>
+                        <div className="mono" style={{ fontSize: "10px", color: "#7a6440" }}>{item.desc}</div>
                       </div>
-                      {count >= 2 && (
-                        <div className="btn" onClick={() => equipArmorSet(set.key)} style={{ ...(equipped ? btnPrimary : btnGhost), padding: "5px 9px", fontSize: "10px" }}>{equipped ? "Worn ✓" : "Wear"}</div>
+                      {owned ? <span className="mono" style={{ fontSize: "10px", color: "#4C8A57", fontWeight: 700 }}>Owned</span> : (
+                        <div className="btn btn3d" onClick={() => buyLoadoutItem(item.id)} style={{ ...(affordable ? btnPrimary : btnGhost), padding: "5px 9px", fontSize: "10px" }}>{item.cost} <Icon name="gem" size={10} color={affordable ? "#f5ecd2" : "#7a6440"} style={{ verticalAlign: "-1px" }} /></div>
                       )}
                     </div>
-                    {!unlocked ? (
-                      <div className="mono" style={{ fontSize: "10px", color: "#8a7550" }}>Undiscovered — appears once you experience a {set.name.includes("Legion") ? "Roman" : ""} run themed after this set.</div>
-                    ) : (
-                      <div style={{ display: "flex", gap: "6px", flexWrap: "wrap" }}>
-                        {Object.entries(set.pieces).map(([slotName, pieceName]) => {
-                          const owned = state.armor.owned.includes(`${set.key}:${slotName}`);
-                          return owned ? (
-                            <span key={slotName} className="mono" style={{ fontSize: "10px", color: "#4C8A57", fontWeight: 700, border: "1px solid #4C8A57", borderRadius: "5px", padding: "3px 6px" }}>{pieceName} ✓</span>
-                          ) : (
-                            <div key={slotName} className="btn" onClick={() => buyArmorPiece(set.key, slotName)} style={{ ...btnGhost, padding: "3px 6px", fontSize: "10px" }}>{pieceName} — {set.cost} <Icon name="gem" size={9} color="#5a4326" style={{ verticalAlign: "-1px" }} /></div>
-                          );
-                        })}
-                      </div>
-                    )}
-                    <div className="mono" style={{ fontSize: "9px", color: "#8a7550", marginTop: "6px" }}>2pc: {set.bonus2.label} · 3pc: {set.bonus3.label}</div>
-                  </div>
-                );
-              })}
+                  );
+                })}
+              </div>
             </div>
           </div>
         )}
