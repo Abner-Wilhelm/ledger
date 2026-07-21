@@ -4,9 +4,9 @@
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0" />
 <title>The Ledger</title>
-<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>📒</text></svg>" />
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>⚔️</text></svg>" />
 <style>
-  html, body { margin: 0; padding: 0; background: #0B0B10; }
+  html, body { margin: 0; padding: 0; background: #170f09; }
 </style>
 <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
 <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
@@ -47,6 +47,26 @@ function Icon({ name, size = 16, color = "currentColor", style }) {
       return <svg {...p}><path d="M12 2 4 5v6c0 5 3.5 8.5 8 11 4.5-2.5 8-6 8-11V5z" /></svg>;
     case "sword":
       return <svg {...p}><path d="M5 19 19 5M15 5h4v4M9 15l-4 4M13 11l2 2" /></svg>;
+    case "chest":
+      return <svg {...p}><rect x="3" y="10" width="18" height="9" rx="1.5" /><path d="M3 10c0-3.5 4-6 9-6s9 2.5 9 6" /><rect x="10.5" y="11.5" width="3" height="3" rx="0.5" fill={color} stroke="none" /></svg>;
+    case "flame":
+      return <svg {...p} fill={color} stroke="none"><path d="M12 2c2.2 3.8-2.6 5.2-2.6 9a2.6 2.6 0 0 0 5.2 0c0-1.8-.9-2.7-.9-2.7s1.8.9 1.8 3.7a4.5 4.5 0 0 1-9 0c0-4.6 3.6-5.8 5.5-10z" /></svg>;
+    case "crown":
+      return <svg {...p}><path d="M3 18h18M4 18l-1-9 5 4 4-7 4 7 5-4-1 9" /></svg>;
+    case "cog":
+      return <svg {...p}><circle cx="12" cy="12" r="3" /><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z" /></svg>;
+    case "download":
+      return <svg {...p}><path d="M12 3v12M7 10l5 5 5-5M5 21h14" /></svg>;
+    case "upload":
+      return <svg {...p}><path d="M12 21V9M7 14l5-5 5 5M5 3h14" /></svg>;
+    case "cloud":
+      return <svg {...p}><path d="M17.5 19a4.5 4.5 0 0 0 0-9 6 6 0 0 0-11.6 1.7A4 4 0 0 0 6.5 19h11z" /></svg>;
+    case "helmet":
+      return <svg {...p}><path d="M4 14a8 8 0 0 1 16 0v2H4z" /><path d="M4 16v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-2" /></svg>;
+    case "trophy":
+      return <svg {...p}><path d="M8 21h8M12 17v4M7 4h10v4a5 5 0 0 1-10 0z" /><path d="M7 5H4a3 3 0 0 0 3 5M17 5h3a3 3 0 0 1-3 5" /></svg>;
+    case "wand":
+      return <svg {...p}><path d="M5 19 19 5M15 3l1 2 2 1-2 1-1 2-1-2-2-1 2-1z" /></svg>;
     default:
       return null;
   }
@@ -54,26 +74,22 @@ function Icon({ name, size = 16, color = "currentColor", style }) {
 
 // ---------------- DEFS ----------------
 const STATS = {
-  body:  { label: "Body",  icon: "dumbbell", color: "#8CA88C", desc: "training, health" },
-  craft: { label: "Craft", icon: "music",     color: "#B08A5A", desc: "solo dev, Mythbound" },
-  bond:  { label: "Bond",  icon: "users",     color: "#7C93A8", desc: "people who matter" },
-  order: { label: "Order", icon: "scroll",    color: "#A8895A", desc: "admin, life upkeep" },
-  path:  { label: "Path",  icon: "briefcase", color: "#9A7CA8", desc: "career, opportunity" },
+  body:  { label: "Body",  icon: "dumbbell", color: "#C1543F", desc: "training, health" },
+  craft: { label: "Craft", icon: "music",     color: "#CB9A3E", desc: "solo dev, Mythbound" },
+  order: { label: "Order", icon: "scroll",    color: "#4C8A57", desc: "admin, life upkeep" },
 };
 
 const RARITY = [
-  { key: "common",   weight: 60, color: "#8B8378", shards: [3, 6] },
-  { key: "uncommon", weight: 25, color: "#6FA88C", shards: [7, 12] },
-  { key: "rare",     weight: 12, color: "#5C8FB0", shards: [13, 22] },
-  { key: "epic",     weight: 3,  color: "#B0678F", shards: [25, 40] },
+  { key: "common",   weight: 60, color: "#9B9077", shards: [3, 6] },
+  { key: "uncommon", weight: 25, color: "#4C8A57", shards: [7, 12] },
+  { key: "rare",     weight: 12, color: "#3E7FAE", shards: [13, 22] },
+  { key: "epic",     weight: 3,  color: "#C1548F", shards: [25, 40] },
 ];
 
 const SIGILS = [
   { text: "Iron Resolve — Body pays double XP today.", stat: "body", mult: 2 },
   { text: "Muse's Favor — Craft pays double XP today.", stat: "craft", mult: 2 },
-  { text: "Open Door — Bond pays double XP today.", stat: "bond", mult: 2 },
   { text: "The Static Hour — Order pays double XP today.", stat: "order", mult: 2 },
-  { text: "Clear Signal — Path pays double XP today.", stat: "path", mult: 2 },
   { text: "Windfall — all loot rolls +1 rarity tier today.", stat: "loot", mult: 1 },
   { text: "Quiet Day — no modifier. Progress is still progress.", stat: null, mult: 1 },
 ];
@@ -83,7 +99,6 @@ const CHALLENGE_POOL = [
   { text: "Fix the bug or system you've been avoiding in Mythbound.", cat: "craft", xp: 30 },
   { text: "20 uninterrupted minutes on the hardest part of solo dev.", cat: "craft", xp: 25 },
   { text: "Go to failure on one gym exercise today.", cat: "body", xp: 22 },
-  { text: "Reach out to one FIEA person you haven't talked to in a while.", cat: "bond", xp: 18 },
   { text: "Learn one new technique or tool you don't already know.", cat: "craft", xp: 22 },
   { text: "Full deep clean of one room, no shortcuts.", cat: "order", xp: 20 },
   { text: "Compose or arrange music for 20 min, no distractions.", cat: "craft", xp: 18 },
@@ -98,15 +113,10 @@ const DEFAULT_POOL = [
   { id: "c2", cat: "craft", text: "Mythbound: ship one meaningful task", ignition: "Open the relevant file", xp: 20 },
   { id: "c3", cat: "craft", text: "Portfolio site: one real improvement", ignition: "Open the site's source", xp: 12 },
   { id: "c4", cat: "craft", text: "Code review / documentation pass", ignition: "Open the doc or diff", xp: 10 },
-  { id: "n1", cat: "bond", text: "Real undistracted time with your girlfriend", ignition: "Put your phone in another room", xp: 15 },
-  { id: "n2", cat: "bond", text: "Play with Hera, no phone", ignition: "Grab a toy", xp: 8 },
-  { id: "n3", cat: "bond", text: "Reach out to a FIEA person", ignition: "Open the chat thread", xp: 10 },
   { id: "o1", cat: "order", text: "Inbox / admin cleanup", ignition: "Open one tab you've been avoiding", xp: 8 },
   { id: "o2", cat: "order", text: "Laundry, fully folded and put away", ignition: "Start the load", xp: 10 },
   { id: "o3", cat: "order", text: "Clean your room", ignition: "Pick up 5 things", xp: 10 },
   { id: "o4", cat: "order", text: "Learn a new skill, any amount", ignition: "Find one resource", xp: 12 },
-  { id: "p1", cat: "path", text: "Take a new opportunity forward", ignition: "Read what it actually requires", xp: 14 },
-  { id: "p2", cat: "path", text: "Work toward making money", ignition: "Write down the next concrete step", xp: 16 },
 ];
 
 const BONUS_POOL = [
@@ -121,14 +131,118 @@ const DEFAULT_VAULT = [
   { id: "r4", text: "A lazy morning, no alarm", cost: 40 },
 ];
 
-const DEFAULT_BOSS = { name: "Solo Dev: Next Milestone", hp: 400, maxHp: 400 };
+const FORK_PROMPTS = [
+  "A hooded stranger offers you a wager.",
+  "You find a locked chest and only one key fits.",
+  "The path splits ahead of you.",
+  "An old crone offers a gamble, cackling.",
+  "Two doors. Only one holds treasure.",
+];
+const FORK_CHANCE = 0.22;
+const TIMED_XP_PER_HOUR = 14;
+const TIMED_SHARD_PER_HOUR = 4;
+
+// ---------------- WEEKLY RUN THEMES ----------------
+const THEMES = [
+  { key: "kingdom", name: "The Kingdom", logLabel: "The Ledger", emoji: "⚔️", accent: "#CB9A3E", accent2: "#C1548F", font: "MedievalSharp",
+    cardBg: ["#f5e6bf", "#ecd6a3"], cardBorder: "#b3925a", plaqueBg: ["#2c2015", "#1d150e"], plaqueBorder: "#6b4a26",
+    pageBg: ["#2c2015", "#1d150e", "#120c07"],
+    bossNames: ["The Rot Warden", "Ashen Sentinel", "The Hollow Knight of Doubt", "Grief, the Undying", "Old Man Inertia", "The Comfort Wraith"] },
+  { key: "roman", name: "Roman Campaign", logLabel: "Campaign Ledger", emoji: "🏛️", accent: "#D4AF37", accent2: "#8F2B2B", font: "Cinzel",
+    cardBg: ["#efe9df", "#ddd4c2"], cardBorder: "#D4AF37", plaqueBg: ["#241f18", "#171310"], plaqueBorder: "#8F2B2B",
+    pageBg: ["#26201a", "#18130f", "#0d0a07"],
+    bossNames: ["The Legion's Shade", "Centurion of Ash", "The Rubicon Wraith", "Praetorian of Doubt"] },
+  { key: "pirate", name: "Pirate's Voyage", logLabel: "Captain's Log", emoji: "🏴‍☠️", accent: "#2FA89E", accent2: "#B3742B", font: "Pirata One",
+    cardBg: ["#e9dcc0", "#cdb98d"], cardBorder: "#2FA89E", plaqueBg: ["#16211f", "#0d1513"], plaqueBorder: "#17403c",
+    pageBg: ["#152522", "#0e1917", "#070c0b"],
+    bossNames: ["The Kraken's Reckoning", "Bosun of the Drowned", "The Becalmed Curse", "Admiral Undertow"] },
+  { key: "space", name: "Deep Space Run", logLabel: "Mission Log", emoji: "🚀", accent: "#3ECBDC", accent2: "#8A5AD6", font: "Orbitron",
+    cardBg: ["#dbe6ea", "#b9ccd4"], cardBorder: "#3ECBDC", plaqueBg: ["#0d1420", "#080c14"], plaqueBorder: "#1c3a44",
+    pageBg: ["#0e1626", "#0a0f1c", "#04060c"],
+    bossNames: ["The Void Warden", "Static Construct", "The Derelict Mind", "Signal-Eater Prime"] },
+  { key: "cowboy", name: "Frontier Run", logLabel: "Trail Journal", emoji: "🤠", accent: "#C98A3E", accent2: "#7A3B2B", font: "Rye",
+    cardBg: ["#e3c79a", "#c9a066"], cardBorder: "#7A3B2B", plaqueBg: ["#241a12", "#160f0a"], plaqueBorder: "#4a2e1c",
+    pageBg: ["#271c13", "#19120b", "#0e0a06"],
+    bossNames: ["The Iron Outlaw", "Sheriff of Nowhere", "The Dust Reckoning", "Old Widowmaker"] },
+  { key: "future", name: "Neon Future", logLabel: "Data Ledger", emoji: "🌆", accent: "#E04FD0", accent2: "#4FE0D0", font: "Monoton",
+    cardBg: ["#ecd9ea", "#d9bcd6"], cardBorder: "#E04FD0", plaqueBg: ["#1c0f22", "#100816"], plaqueBorder: "#4a1f4a",
+    pageBg: ["#20122a", "#130a1a", "#08040c"],
+    bossNames: ["The Corp Enforcer", "Ghost in the Feed", "Firewall Sentinel", "The Latency Beast"] },
+];
+const BASE_BOSS_HP = 480;
+
+// ---------------- EQUIPMENT: loadout (weekly, rotating) ----------------
+const LOADOUT_ITEMS = [
+  { id: "blade", slot: "weapon", name: "Worn Blade", desc: "Boss damage +15%.", cost: 100, icon: "sword", effect: { bossDmgMult: 1.15 } },
+  { id: "daggers", slot: "weapon", name: "Twin Daggers", desc: "15% chance to strike the boss twice.", cost: 140, icon: "sword", effect: { doubleBossChance: 0.15 } },
+  { id: "warhammer", slot: "weapon", name: "Warhammer", desc: "'Push further' completions deal +50% boss damage.", cost: 160, icon: "sword", effect: { stretchBossMult: 1.5 } },
+  { id: "luckyCoin", slot: "accessory", name: "Lucky Coin", desc: "Every loot roll is treated as blessed.", cost: 220, icon: "gem", effect: { lootBoost: true } },
+  { id: "purse", slot: "accessory", name: "Golden Purse", desc: "+10% shards from all loot.", cost: 200, icon: "chest", effect: { shardMult: 1.10 } },
+  { id: "hourglass", slot: "accessory", name: "Hourglass Charm", desc: "Fork encounters twice as often.", cost: 150, icon: "sparkles", effect: { forkMult: 2 } },
+  { id: "ward", slot: "accessory", name: "Guardian Ward", desc: "Missed days don't build the curse meter.", cost: 170, icon: "shield", effect: { noCurse: true } },
+  { id: "momentum", slot: "accessory", name: "Momentum Band", desc: "+2 bonus shards for every board quest after your first each day.", cost: 150, icon: "sparkles", effect: { momentum: 2 } },
+  { id: "ledger", slot: "accessory", name: "Merchant's Ledger", desc: "Vault reward costs -10%.", cost: 130, icon: "scroll", effect: { vaultDiscount: 0.9 } },
+  { id: "traveler", slot: "accessory", name: "Traveler's Charm", desc: "All stats gain +5% XP.", cost: 160, icon: "briefcase", effect: { xpMultAll: 1.05 } },
+];
+
+// ---------------- EQUIPMENT: armor sets (permanent, no rarity, set-bonus focused) ----------------
+const ARMOR_SETS = [
+  { key: "roman", stat: "body", name: "Roman Legion", pieces: { helmet: "Legionary Helm", chest: "Segmented Cuirass", legs: "Marching Greaves" }, cost: 90,
+    bonus2: { label: "Body XP +8%", xpMult: 1.08 }, bonus3: { label: "Body XP +15%, and Body quests chip 5 bonus boss damage", xpMult: 1.15, bossChip: 5 } },
+  { key: "pirate", stat: "body", name: "Buccaneer's Rig", pieces: { helmet: "Tricorn Hat", chest: "Weathered Coat", legs: "Sea-Boots" }, cost: 90,
+    bonus2: { label: "Body XP +8%", xpMult: 1.08 }, bonus3: { label: "Body XP +15%, 20% chance to double loot on Body quests", xpMult: 1.15, doubleLootChance: 0.2 } },
+  { key: "space", stat: "craft", name: "Star-Forged Rig", pieces: { helmet: "Void Visor", chest: "Pressure Plate", legs: "Grav-Boots" }, cost: 90,
+    bonus2: { label: "Craft XP +8%", xpMult: 1.08 }, bonus3: { label: "Craft XP +15%, better loot odds on Craft quests", xpMult: 1.15, lootBoost: true } },
+  { key: "future", stat: "craft", name: "Netrunner's Kit", pieces: { helmet: "Neural Crown", chest: "Circuit Vest", legs: "Kinetic Boots" }, cost: 90,
+    bonus2: { label: "Craft XP +8%", xpMult: 1.08 }, bonus3: { label: "Craft XP +15%, double chance of a Fork on Craft quests", xpMult: 1.15, forkMult: 2 } },
+  { key: "kingdom", stat: "order", name: "Warden's Vestments", pieces: { helmet: "Iron Circlet", chest: "Warden's Plate", legs: "Sentinel Greaves" }, cost: 90,
+    bonus2: { label: "Order XP +8%", xpMult: 1.08 }, bonus3: { label: "Order XP +15%, curse meter caps at 2 instead of 3", xpMult: 1.15, curseCap: 2 } },
+  { key: "cowboy", stat: "order", name: "Ranger's Outfit", pieces: { helmet: "Wide-Brim Hat", chest: "Duster Coat", legs: "Spurred Boots" }, cost: 90,
+    bonus2: { label: "Order XP +8%", xpMult: 1.08 }, bonus3: { label: "Order XP +15%, +3 flat shards per Order quest", xpMult: 1.15, flatShardBonus: 3 } },
+];
+
+// ---------------- ACHIEVEMENTS ----------------
+const THEME_ACHIEVEMENTS = THEMES.map(t => ({ id: `clear_${t.key}`, name: `Conqueror of ${t.name}`, desc: `Defeat the boss during a ${t.name} run.`, check: s => s.clearedThemes.includes(t.key) }));
+const ACHIEVEMENTS = [
+  { id: "first_quest", name: "First Steps", desc: "Complete your first quest.", check: s => s.lifetime.questsDone >= 1 },
+  { id: "streak_3", name: "Building Momentum", desc: "Reach a 3-day streak.", check: s => s.streak >= 3 },
+  { id: "streak_7", name: "A Full Week", desc: "Reach a 7-day streak.", check: s => s.streak >= 7 },
+  { id: "streak_14", name: "Unbreakable", desc: "Reach a 14-day streak.", check: s => s.streak >= 14 },
+  { id: "boss_slain", name: "Giant Slayer", desc: "Defeat your first boss.", check: s => s.lifetime.bossesDefeated >= 1 },
+  { id: "boss_slain_5", name: "Veteran", desc: "Defeat 5 bosses total.", check: s => s.lifetime.bossesDefeated >= 5 },
+  ...THEME_ACHIEVEMENTS,
+  { id: "full_set", name: "Suited Up", desc: "Own a complete 3-piece armor set.", check: s => ARMOR_SETS.some(set => armorPieceCount(s, set.key) >= 3) },
+  { id: "collector", name: "The Collector", desc: "Own every armor set in full.", check: s => ARMOR_SETS.every(set => armorPieceCount(s, set.key) >= 3) },
+  { id: "shard_100", name: "Modest Hoard", desc: "Hold 100 shards at once.", check: s => s.shards >= 100 },
+  { id: "shard_500", name: "Dragon's Hoard", desc: "Hold 500 shards at once.", check: s => s.shards >= 500 },
+  { id: "level_5_all", name: "Well-Rounded", desc: "Reach level 5 in every stat.", check: s => Object.values(s.stats).every(st => xpToLevel(st.xp) >= 5) },
+];
+
+// ---------------- persistence keys ----------------
+const STORAGE_KEY = "the-ledger-state";
+const TOKEN_KEY = "the-ledger-gist-token";
+const GISTID_KEY = "the-ledger-gist-id";
+const GIST_FILENAME = "the-ledger-save.json";
 
 // ---------------- Utility ----------------
 const uid = () => Math.random().toString(36).slice(2, 9);
 const todayStr = () => new Date().toDateString();
 const xpToLevel = (xp) => Math.floor(xp / 100) + 1;
 const xpInLevel = (xp) => xp % 100;
-const STORAGE_KEY = "the-ledger-state";
+
+function mondayKey(d) {
+  const date = new Date(d);
+  const day = date.getDay();
+  const diff = day === 0 ? -6 : 1 - day;
+  date.setDate(date.getDate() + diff);
+  return date.toISOString().slice(0, 10);
+}
+
+function pickTheme(excludeKey) {
+  const options = THEMES.filter(t => t.key !== excludeKey);
+  const pool = options.length ? options : THEMES;
+  return pool[Math.floor(Math.random() * pool.length)];
+}
 
 function rollRarity(bonus = false) {
   const roll = Math.random() * 100; let acc = 0, idx = 0;
@@ -155,13 +269,159 @@ function drawDailyQuests(pool, stats) {
   return chosen;
 }
 
+function nextBoss(prevMaxHp, floor, namesPool) {
+  const name = namesPool[(floor - 1) % namesPool.length];
+  const maxHp = Math.round(prevMaxHp * 0.7) + 40;
+  return { name, hp: maxHp, maxHp, floor };
+}
+
+// ---------------- equipment math helpers ----------------
+function equippedLoadoutDefs(state) {
+  const ids = [state.loadout.weapon, state.loadout.acc1, state.loadout.acc2].filter(Boolean);
+  return ids.map(id => LOADOUT_ITEMS.find(i => i.id === id)).filter(Boolean);
+}
+function armorPieceCount(state, setKey) {
+  return state.armor.owned.filter(p => p.startsWith(setKey + ":")).length;
+}
+function equippedArmorSet(state) {
+  if (!state.armor.equippedSet) return null;
+  return ARMOR_SETS.find(a => a.key === state.armor.equippedSet) || null;
+}
+function activeArmorBonus(state) {
+  const set = equippedArmorSet(state);
+  if (!set) return null;
+  const count = armorPieceCount(state, set.key);
+  if (count >= 3) return { ...set.bonus3, tier: 3, set };
+  if (count >= 2) return { ...set.bonus2, tier: 2, set };
+  return null;
+}
+function computeXpMult(state, cat) {
+  let mult = 1;
+  equippedLoadoutDefs(state).forEach(item => { if (item.effect.xpMultAll) mult *= item.effect.xpMultAll; });
+  const b = activeArmorBonus(state);
+  if (b && b.set.stat === cat && b.xpMult) mult *= b.xpMult;
+  return mult;
+}
+function computeShardMult(state) {
+  let mult = 1;
+  equippedLoadoutDefs(state).forEach(item => { if (item.effect.shardMult) mult *= item.effect.shardMult; });
+  return mult;
+}
+function hasLootBoost(state) {
+  if (equippedLoadoutDefs(state).some(i => i.effect.lootBoost)) return true;
+  const b = activeArmorBonus(state);
+  return !!(b && b.lootBoost);
+}
+function forkChanceMult(state) {
+  let mult = 1;
+  equippedLoadoutDefs(state).forEach(i => { if (i.effect.forkMult) mult *= i.effect.forkMult; });
+  const b = activeArmorBonus(state); if (b && b.forkMult) mult *= b.forkMult;
+  return mult;
+}
+function bossDmgMult(state) {
+  let mult = 1;
+  equippedLoadoutDefs(state).forEach(i => { if (i.effect.bossDmgMult) mult *= i.effect.bossDmgMult; });
+  return mult;
+}
+function hasNoCurse(state) { return equippedLoadoutDefs(state).some(i => i.effect.noCurse); }
+function curseCap(state) { const b = activeArmorBonus(state); return (b && b.curseCap) ? b.curseCap : 3; }
+function vaultDiscountMult(state) { const item = equippedLoadoutDefs(state).find(i => i.effect.vaultDiscount); return item ? item.effect.vaultDiscount : 1; }
+function momentumBonus(state) { const item = equippedLoadoutDefs(state).find(i => i.effect.momentum); return item ? item.effect.momentum : 0; }
+function doubleBossChance(state) { const item = equippedLoadoutDefs(state).find(i => i.effect.doubleBossChance); return item ? item.effect.doubleBossChance : 0; }
+function stretchBossMult(state) { const item = equippedLoadoutDefs(state).find(i => i.effect.stretchBossMult); return item ? item.effect.stretchBossMult : 1; }
+function armorFlatShardBonus(state, cat) { const b = activeArmorBonus(state); return (b && b.set.stat === cat && b.flatShardBonus) ? b.flatShardBonus : 0; }
+function armorDoubleLootChance(state, cat) { const b = activeArmorBonus(state); return (b && b.set.stat === cat && b.doubleLootChance) ? b.doubleLootChance : 0; }
+function armorBossChip(state, cat) { const b = activeArmorBonus(state); return (b && b.set.stat === cat && b.bossChip) ? b.bossChip : 0; }
+
+function checkAchievements(s) {
+  const newly = [];
+  ACHIEVEMENTS.forEach(a => {
+    if (!s.achievements.includes(a.id) && a.check(s)) { s.achievements.push(a.id); newly.push(a); }
+  });
+  return newly;
+}
+
+// ---------------- cloud sync (GitHub Gist) ----------------
+async function findExistingGist(token) {
+  try {
+    const res = await fetch("https://api.github.com/gists", { headers: { Authorization: `token ${token}`, Accept: "application/vnd.github+json" } });
+    if (!res.ok) return null;
+    const list = await res.json();
+    const found = list.find(g => g.files && g.files[GIST_FILENAME]);
+    return found ? found.id : null;
+  } catch (e) { return null; }
+}
+async function pullFromGist(token) {
+  let gistId = localStorage.getItem(GISTID_KEY);
+  if (!gistId) { gistId = await findExistingGist(token); if (gistId) localStorage.setItem(GISTID_KEY, gistId); }
+  if (!gistId) return null;
+  try {
+    const res = await fetch(`https://api.github.com/gists/${gistId}`, { headers: { Authorization: `token ${token}`, Accept: "application/vnd.github+json" } });
+    if (!res.ok) return null;
+    const data = await res.json();
+    const file = data.files && data.files[GIST_FILENAME];
+    if (!file || !file.content) return null;
+    return JSON.parse(file.content);
+  } catch (e) { return null; }
+}
+async function pushToGist(token, stateObj) {
+  let gistId = localStorage.getItem(GISTID_KEY);
+  if (!gistId) gistId = await findExistingGist(token);
+  const body = { description: "The Ledger — save data", public: false, files: { [GIST_FILENAME]: { content: JSON.stringify(stateObj) } } };
+  try {
+    if (gistId) {
+      const res = await fetch(`https://api.github.com/gists/${gistId}`, { method: "PATCH", headers: { Authorization: `token ${token}`, Accept: "application/vnd.github+json" }, body: JSON.stringify(body) });
+      return res.ok;
+    } else {
+      const res = await fetch("https://api.github.com/gists", { method: "POST", headers: { Authorization: `token ${token}`, Accept: "application/vnd.github+json" }, body: JSON.stringify(body) });
+      if (res.ok) { const data = await res.json(); localStorage.setItem(GISTID_KEY, data.id); return true; }
+      return false;
+    }
+  } catch (e) { return false; }
+}
+
 const defaultState = () => ({
   stats: Object.fromEntries(Object.keys(STATS).map(k => [k, { xp: 0 }])),
   shards: 0, streak: 0, staticMeter: 0, lastOpen: null,
   sigil: SIGILS[6], wheel: { date: null, challenge: null, done: false },
   dailyQuests: [], pool: DEFAULT_POOL, bonusPool: BONUS_POOL,
-  sideQuests: [], vault: DEFAULT_VAULT, boss: DEFAULT_BOSS, lootLog: [],
+  sideQuests: [], vault: DEFAULT_VAULT, lootLog: [],
+  pendingFork: null,
+  boss: { name: "", hp: 0, maxHp: 0, floor: 1 },
+  run: { weekKey: null, theme: null, questsDone: 0, transition: null, scaledStart: false },
+  loadout: { weapon: null, acc1: null, acc2: null }, ownedLoadout: [],
+  armor: { equippedSet: null, owned: [] },
+  seenThemes: [], clearedThemes: [], unlockedSkins: [], activeSkin: null,
+  achievements: [], lifetime: { questsDone: 0, bossesDefeated: 0 },
 });
+
+// ---------------- shared style bits (theme-driven materials) ----------------
+const cardMaterial = (theme) => ({
+  background: `linear-gradient(160deg, ${theme.cardBg[0]} 0%, ${theme.cardBg[1]} 100%)`,
+  border: `2px solid ${theme.cardBorder}`, borderRadius: "12px", color: "#3c2a16",
+  boxShadow: "0 3px 0 rgba(0,0,0,0.25), inset 0 0 24px rgba(180,140,70,0.15)",
+});
+const plaqueMaterial = (theme) => ({
+  background: `linear-gradient(160deg, ${theme.plaqueBg[0]} 0%, ${theme.plaqueBg[1]} 100%)`,
+  border: `2px solid ${theme.plaqueBorder}`, borderRadius: "12px", color: "#f1e2bd",
+  boxShadow: "0 3px 0 rgba(0,0,0,0.4)",
+});
+const btnPrimary = {
+  cursor: "pointer", display: "inline-block", background: "linear-gradient(180deg, #4c8a57, #33603a)",
+  color: "#f5ecd2", border: "2px solid #21391f", borderRadius: "8px", padding: "8px 14px",
+  fontSize: "12px", fontWeight: 800, textAlign: "center", boxShadow: "0 3px 0 #16240f", letterSpacing: "0.3px",
+};
+const btnGhost = {
+  cursor: "pointer", display: "inline-block", background: "rgba(60,42,22,0.08)",
+  color: "#5a4326", border: "2px solid #b3925a", borderRadius: "8px", padding: "8px 14px",
+  fontSize: "11px", fontWeight: 700, textAlign: "center",
+};
+const badge = (color) => ({
+  width: "30px", height: "30px", borderRadius: "50%", display: "flex", alignItems: "center", justifyContent: "center",
+  background: `radial-gradient(circle at 35% 30%, ${color}55, ${color}22)`, border: `2px solid ${color}`, flexShrink: 0,
+});
+
+const DAY_LABELS = ["Rest Day", "Day 1 of 6", "Day 2 of 6", "Day 3 of 6", "Day 4 of 6", "Day 5 of 6", "⚔ Boss Day"];
 
 function TheLedger() {
   const [state, setState] = useState(null);
@@ -171,37 +431,107 @@ function TheLedger() {
   const [spinning, setSpinning] = useState(false);
   const [spinLabel, setSpinLabel] = useState("tap to spin");
   const [newQuest, setNewQuest] = useState({ cat: "body", text: "", xp: 15, ignition: "" });
-  const [newSide, setNewSide] = useState({ text: "", xp: 30 });
+  const [newSide, setNewSide] = useState({ text: "", xp: 30, cat: "craft", timed: false });
+  const [hoursInputs, setHoursInputs] = useState({});
   const [newReward, setNewReward] = useState({ text: "", cost: 30 });
+  const [settingsOpen, setSettingsOpen] = useState(false);
+  const [moreOpen, setMoreOpen] = useState(false);
+  const [moreTab, setMoreTab] = useState("log");
+  const [tokenInput, setTokenInput] = useState("");
+  const [syncStatus, setSyncStatus] = useState(() => (typeof localStorage !== "undefined" && localStorage.getItem(TOKEN_KEY)) ? "idle" : "off");
   const spinIv = useRef(null);
+  const syncTimer = useRef(null);
+  const fileInputRef = useRef(null);
 
   const persist = useCallback((s) => {
     try { localStorage.setItem(STORAGE_KEY, JSON.stringify(s)); } catch (e) { console.error(e); }
   }, []);
 
   useEffect(() => {
-    let s = defaultState();
-    try {
-      const raw = localStorage.getItem(STORAGE_KEY);
-      if (raw) s = { ...defaultState(), ...JSON.parse(raw) };
-    } catch (e) { /* first run */ }
+    (async () => {
+      let s = defaultState();
+      let cloudLoaded = false;
+      const token = localStorage.getItem(TOKEN_KEY);
+      if (token) {
+        const cloud = await pullFromGist(token);
+        if (cloud) { s = { ...defaultState(), ...cloud }; cloudLoaded = true; }
+      }
+      if (!cloudLoaded) {
+        try {
+          const raw = localStorage.getItem(STORAGE_KEY);
+          if (raw) s = { ...defaultState(), ...JSON.parse(raw) };
+        } catch (e) { /* first run */ }
+      }
+      if (!s.run) s.run = defaultState().run;
+      if (!s.loadout) s.loadout = defaultState().loadout;
+      if (!s.armor) s.armor = defaultState().armor;
+      if (!s.lifetime) s.lifetime = defaultState().lifetime;
 
-    if (s.lastOpen !== todayStr()) {
-      const missed = s.lastOpen && s.dailyQuests.some(q => q.stage !== "done");
-      s.staticMeter = missed ? Math.min(s.staticMeter + 1, 3) : Math.max(s.staticMeter - 1, 0);
-      s.streak = missed ? 0 : s.streak;
-      s.sigil = SIGILS[Math.floor(Math.random() * SIGILS.length)];
-      s.dailyQuests = drawDailyQuests(s.pool, s.stats);
-      s.wheel = { date: todayStr(), challenge: null, done: false };
-      s.lastOpen = todayStr();
-    }
-    setState(s);
-    setLoaded(true);
+      // migrate off retired stat categories (Bond/Path removed)
+      s.stats = Object.fromEntries(Object.keys(STATS).map(k => [k, s.stats[k] || { xp: 0 }]));
+      s.pool = s.pool.filter(q => STATS[q.cat]);
+      s.dailyQuests = s.dailyQuests.filter(q => STATS[q.cat]);
+      s.sideQuests = s.sideQuests.filter(q => STATS[q.cat]);
+      s.bonusPool = s.bonusPool.filter(q => STATS[q.cat]);
+      if (s.wheel.challenge && !STATS[s.wheel.challenge.cat]) s.wheel = { date: null, challenge: null, done: false };
+
+      if (s.lastOpen !== todayStr()) {
+        const missed = s.lastOpen && s.dailyQuests.some(q => q.stage !== "done");
+        if (missed && !hasNoCurse(s)) s.staticMeter = Math.min(s.staticMeter + 1, curseCap(s));
+        else if (!missed) s.staticMeter = Math.max(s.staticMeter - 1, 0);
+        s.streak = missed ? 0 : s.streak;
+        s.sigil = SIGILS[Math.floor(Math.random() * SIGILS.length)];
+        s.dailyQuests = drawDailyQuests(s.pool, s.stats);
+        s.wheel = { date: todayStr(), challenge: null, done: false };
+        s.lastOpen = todayStr();
+      }
+
+      const wk = mondayKey(new Date());
+      if (!s.run.weekKey) {
+        const theme = pickTheme(null);
+        const dow = new Date().getDay();
+        const dowCalc = dow === 0 ? 7 : dow;
+        const remaining = dowCalc <= 6 ? Math.max(7 - dowCalc, 1) : 1;
+        const scaled = remaining < 6;
+        const hp = Math.max(120, Math.round(BASE_BOSS_HP * remaining / 6));
+        s.run = { weekKey: wk, theme: theme.key, questsDone: 0, transition: null, scaledStart: scaled };
+        s.boss = { name: theme.bossNames[0], hp, maxHp: hp, floor: 1 };
+        if (!s.seenThemes.includes(theme.key)) s.seenThemes.push(theme.key);
+      } else if (s.run.weekKey !== wk && !s.run.transition) {
+        const oldTheme = THEMES.find(t => t.key === s.run.theme) || THEMES[0];
+        const result = s.boss.hp <= 0 ? "victory" : "escaped";
+        s.run.transition = { oldThemeName: oldTheme.name, oldThemeKey: oldTheme.key, result, questsDone: s.run.questsDone, ownedLoadout: [...s.ownedLoadout] };
+      }
+      if (s.run.theme && !s.seenThemes.includes(s.run.theme)) s.seenThemes.push(s.run.theme);
+
+      setState(s);
+      setLoaded(true);
+    })();
   }, []);
 
-  useEffect(() => { if (loaded && state) persist(state); }, [state, loaded, persist]);
+  useEffect(() => {
+    if (!loaded || !state) return;
+    persist(state);
+    const token = localStorage.getItem(TOKEN_KEY);
+    if (token) {
+      setSyncStatus("saving");
+      clearTimeout(syncTimer.current);
+      syncTimer.current = setTimeout(async () => {
+        const ok = await pushToGist(token, state);
+        setSyncStatus(ok ? "synced" : "error");
+      }, 2000);
+    }
+  }, [state, loaded, persist]);
 
-  const showToast = (msg, color) => { setToastMsg({ msg, color }); setTimeout(() => setToastMsg(null), 2600); };
+  useEffect(() => {
+    if (!loaded || !state || !state.run || !state.run.theme) return;
+    const liveTheme = THEMES.find(t => t.key === state.run.theme) || THEMES[0];
+    document.title = `The Ledger — ${liveTheme.name}`;
+    const link = document.querySelector('link[rel="icon"]');
+    if (link) link.href = `data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>${encodeURIComponent(liveTheme.emoji)}</text></svg>`;
+  }, [loaded, state && state.run && state.run.theme]);
+
+  const showToast = (msg, color) => { setToastMsg({ msg, color }); setTimeout(() => setToastMsg(null), 2800); };
 
   const igniteQuest = (u) => {
     setState(prev => {
@@ -210,7 +540,7 @@ function TheLedger() {
       if (!q || q.stage !== "new") return prev;
       q.stage = "ignited";
       s.shards += 2;
-      showToast("Started. +2 shards for showing up.", "#8B8378");
+      showToast("Started. +2 shards for showing up.", "#9B9077");
       return s;
     });
   };
@@ -221,17 +551,83 @@ function TheLedger() {
       const q = s.dailyQuests.find(x => x.uid === u);
       if (!q || q.stage === "done") return prev;
       q.stage = "done";
-      const mult = (s.sigil.stat === q.cat) ? s.sigil.mult : 1;
-      let xpGain = Math.round(q.xp * mult);
+      const sigilMult = (s.sigil.stat === q.cat) ? s.sigil.mult : 1;
+      const gearMult = computeXpMult(s, q.cat);
+      let xpGain = Math.round(q.xp * sigilMult * gearMult);
       if (stretch) xpGain = Math.round(xpGain * 1.4);
       s.stats[q.cat].xp += xpGain;
-      const loot = rollRarity((s.sigil.stat === "loot") || stretch);
-      s.shards += loot.shards;
-      s.boss.hp = Math.max(0, s.boss.hp - Math.round(xpGain * 0.6));
-      s.lootLog.unshift({ id: uid(), text: q.text + (stretch ? " (pushed further)" : ""), rarity: loot.rarity, color: loot.color, shards: loot.shards, xp: xpGain, at: Date.now() });
+      const boosted = (s.sigil.stat === "loot") || stretch || hasLootBoost(s);
+      const loot = rollRarity(boosted);
+      let shardGain = Math.round(loot.shards * computeShardMult(s));
+      shardGain += armorFlatShardBonus(s, q.cat);
+      const doneSoFar = s.dailyQuests.filter(x => x.stage === "done").length;
+      if (doneSoFar > 1) shardGain += momentumBonus(s);
+      if (Math.random() < armorDoubleLootChance(s, q.cat)) shardGain *= 2;
+      s.shards += shardGain;
+
+      let bossDmg = Math.round(xpGain * 0.6 * bossDmgMult(s));
+      if (stretch) bossDmg = Math.round(bossDmg * stretchBossMult(s));
+      bossDmg += armorBossChip(s, q.cat);
+      if (Math.random() < doubleBossChance(s)) bossDmg *= 2;
+      s.boss.hp = Math.max(0, s.boss.hp - bossDmg);
+
+      s.lootLog.unshift({ id: uid(), text: q.text + (stretch ? " (pushed further)" : ""), rarity: loot.rarity, color: loot.color, shards: shardGain, xp: xpGain, at: Date.now() });
+
+      if (Math.random() < 0.04) {
+        const notOwned = LOADOUT_ITEMS.filter(i => !s.ownedLoadout.includes(i.id));
+        if (notOwned.length) {
+          const drop = notOwned[Math.floor(Math.random() * notOwned.length)];
+          s.ownedLoadout.push(drop.id);
+          s.lootLog.unshift({ id: uid(), text: `Rare find: ${drop.name}!`, rarity: "epic", color: "#C1548F", shards: 0, xp: 0, at: Date.now() });
+        }
+      }
       s.lootLog = s.lootLog.slice(0, 30);
       if (s.dailyQuests.every(x => x.stage === "done")) s.streak += 1;
-      showToast(`+${xpGain} XP · ${loot.shards} shards (${loot.rarity})`, loot.color);
+      s.run.questsDone = (s.run.questsDone || 0) + 1;
+      s.lifetime.questsDone = (s.lifetime.questsDone || 0) + 1;
+
+      const theme = THEMES.find(t => t.key === s.run.theme) || THEMES[0];
+      if (s.boss.hp <= 0) {
+        const clearedFloor = s.boss.floor;
+        const bonus = 20 + clearedFloor * 5;
+        s.shards += bonus;
+        s.lifetime.bossesDefeated = (s.lifetime.bossesDefeated || 0) + 1;
+        s.lootLog.unshift({ id: uid(), text: `${s.boss.name} falls! (${clearedFloor > 1 ? "elite " : ""}encounter cleared)`, rarity: "epic", color: "#C1548F", shards: bonus, xp: 0, at: Date.now() });
+        s.boss = nextBoss(s.boss.maxHp, clearedFloor + 1, theme.bossNames);
+        showToast(`${clearedFloor > 1 ? "Elite cleared" : "Boss cleared"}! +${bonus} bonus shards`, theme.accent);
+      } else {
+        showToast(`+${xpGain} XP · ${shardGain} shards (${loot.rarity})`, loot.color);
+      }
+
+      if (!stretch && !s.pendingFork && Math.random() < FORK_CHANCE * forkChanceMult(s)) {
+        s.pendingFork = { id: uid(), prompt: FORK_PROMPTS[Math.floor(Math.random() * FORK_PROMPTS.length)], safeAmt: 6, riskWin: 18 };
+      }
+      const newly = checkAchievements(s);
+      if (newly.length) setTimeout(() => showToast(`🏆 Trophy: ${newly[0].name}`, "#CB9A3E"), 400);
+      return s;
+    });
+  };
+
+  const resolveFork = (choice) => {
+    setState(prev => {
+      if (!prev.pendingFork) return prev;
+      const s = structuredClone(prev);
+      const f = s.pendingFork;
+      s.pendingFork = null;
+      if (choice === "safe") {
+        s.shards += f.safeAmt;
+        s.lootLog.unshift({ id: uid(), text: "Played it safe", rarity: "common", color: "#9B9077", shards: f.safeAmt, xp: 0, at: Date.now() });
+        showToast(`Safe choice: +${f.safeAmt} shards`, "#9B9077");
+      } else {
+        const win = Math.random() < 0.5;
+        if (win) {
+          s.shards += f.riskWin;
+          s.lootLog.unshift({ id: uid(), text: "Pushed your luck — it paid off!", rarity: "rare", color: "#3E7FAE", shards: f.riskWin, xp: 0, at: Date.now() });
+          showToast(`Luck favors you! +${f.riskWin} shards`, "#3E7FAE");
+        } else {
+          showToast("The gamble fizzles. No bonus this time.", "#8e2b2b");
+        }
+      }
       return s;
     });
   };
@@ -258,13 +654,16 @@ function TheLedger() {
       const c = s.wheel.challenge;
       if (!c || s.wheel.done) return prev;
       s.wheel.done = true;
-      const mult = (s.sigil.stat === c.cat) ? s.sigil.mult : 1;
-      const xpGain = Math.round(c.xp * mult);
+      const xpGain = Math.round(c.xp * (s.sigil.stat === c.cat ? s.sigil.mult : 1) * computeXpMult(s, c.cat));
       s.stats[c.cat].xp += xpGain;
       const loot = rollRarity(true);
-      s.shards += loot.shards;
-      s.lootLog.unshift({ id: uid(), text: "Wheel: " + c.text, rarity: loot.rarity, color: loot.color, shards: loot.shards, xp: xpGain, at: Date.now() });
-      showToast(`Challenge cleared! +${xpGain} XP · ${loot.shards} shards`, loot.color);
+      const shardGain = Math.round(loot.shards * computeShardMult(s));
+      s.shards += shardGain;
+      s.lootLog.unshift({ id: uid(), text: "Wheel: " + c.text, rarity: loot.rarity, color: loot.color, shards: shardGain, xp: xpGain, at: Date.now() });
+      s.run.questsDone = (s.run.questsDone || 0) + 1;
+      s.lifetime.questsDone = (s.lifetime.questsDone || 0) + 1;
+      checkAchievements(s);
+      showToast(`Challenge cleared! +${xpGain} XP · ${shardGain} shards`, loot.color);
       return s;
     });
   };
@@ -274,11 +673,16 @@ function TheLedger() {
       const s = structuredClone(prev);
       const b = s.bonusPool.find(x => x.id === bId);
       if (!b) return prev;
-      s.stats[b.cat].xp += b.xp;
-      const loot = rollRarity(false);
-      s.shards += loot.shards;
-      s.lootLog.unshift({ id: uid(), text: "Bonus: " + b.text, rarity: loot.rarity, color: loot.color, shards: loot.shards, xp: b.xp, at: Date.now() });
-      showToast(`+${b.xp} XP · ${loot.shards} shards`, loot.color);
+      const xpGain = Math.round(b.xp * computeXpMult(s, b.cat));
+      s.stats[b.cat].xp += xpGain;
+      const loot = rollRarity(hasLootBoost(s));
+      const shardGain = Math.round(loot.shards * computeShardMult(s));
+      s.shards += shardGain;
+      s.lootLog.unshift({ id: uid(), text: "Bonus: " + b.text, rarity: loot.rarity, color: loot.color, shards: shardGain, xp: xpGain, at: Date.now() });
+      s.run.questsDone = (s.run.questsDone || 0) + 1;
+      s.lifetime.questsDone = (s.lifetime.questsDone || 0) + 1;
+      checkAchievements(s);
+      showToast(`+${xpGain} XP · ${shardGain} shards`, loot.color);
       return s;
     });
   };
@@ -287,13 +691,13 @@ function TheLedger() {
     if (!newQuest.text.trim()) return;
     setState(prev => ({ ...prev, pool: [...prev.pool, { id: uid(), cat: newQuest.cat, text: newQuest.text, xp: newQuest.xp, ignition: newQuest.ignition || "Just start" }] }));
     setNewQuest({ cat: "body", text: "", xp: 15, ignition: "" });
-    showToast("Added to quest pool", "#8CA88C");
+    showToast("Added to quest pool", "#4C8A57");
   };
 
   const addSideQuest = () => {
     if (!newSide.text.trim()) return;
-    setState(prev => ({ ...prev, sideQuests: [...prev.sideQuests, { id: uid(), uid: uid(), cat: "path", text: newSide.text, xp: newSide.xp, stage: "new" }] }));
-    setNewSide({ text: "", xp: 30 });
+    setState(prev => ({ ...prev, sideQuests: [...prev.sideQuests, { id: uid(), uid: uid(), cat: newSide.cat, text: newSide.text, xp: newSide.timed ? null : newSide.xp, timed: newSide.timed, stage: "new" }] }));
+    setNewSide({ text: "", xp: 30, cat: "craft", timed: false });
   };
 
   const completeSide = (u) => {
@@ -302,11 +706,61 @@ function TheLedger() {
       const q = s.sideQuests.find(x => x.uid === u);
       if (!q || q.stage === "done") return prev;
       q.stage = "done";
-      s.stats[q.cat].xp += q.xp;
-      const loot = rollRarity(false);
-      s.shards += loot.shards;
-      s.lootLog.unshift({ id: uid(), text: q.text, rarity: loot.rarity, color: loot.color, shards: loot.shards, xp: q.xp, at: Date.now() });
-      showToast(`+${q.xp} XP · ${loot.shards} shards`, loot.color);
+      const xpGain = Math.round(q.xp * computeXpMult(s, q.cat));
+      s.stats[q.cat].xp += xpGain;
+      const loot = rollRarity(hasLootBoost(s));
+      const shardGain = Math.round(loot.shards * computeShardMult(s));
+      s.shards += shardGain;
+      s.lootLog.unshift({ id: uid(), text: q.text, rarity: loot.rarity, color: loot.color, shards: shardGain, xp: xpGain, at: Date.now() });
+      s.run.questsDone = (s.run.questsDone || 0) + 1;
+      s.lifetime.questsDone = (s.lifetime.questsDone || 0) + 1;
+      checkAchievements(s);
+      showToast(`+${xpGain} XP · ${shardGain} shards`, loot.color);
+      return s;
+    });
+  };
+
+  const completeTimedSide = (u, hours) => {
+    setState(prev => {
+      const s = structuredClone(prev);
+      const q = s.sideQuests.find(x => x.uid === u);
+      if (!q || q.stage === "done") return prev;
+      const h = Math.max(0.25, Math.min(40, hours || 0));
+      q.stage = "done";
+      q.hoursLogged = h;
+      const xpGain = Math.round(h * TIMED_XP_PER_HOUR * computeXpMult(s, q.cat));
+      q.xpGained = xpGain;
+      s.stats[q.cat].xp += xpGain;
+
+      const numRolls = 1 + Math.floor(h / 2);
+      const rolls = Array.from({ length: numRolls }, () => rollRarity(hasLootBoost(s)));
+      let best = rolls[0];
+      rolls.forEach(r => { if (RARITY.findIndex(x => x.key === r.rarity) > RARITY.findIndex(x => x.key === best.rarity)) best = r; });
+      let shardGain = Math.round(h * TIMED_SHARD_PER_HOUR * computeShardMult(s));
+      rolls.forEach(r => { shardGain += r.shards; });
+      s.shards += shardGain;
+
+      let bossDmg = Math.round(xpGain * 0.6 * bossDmgMult(s));
+      bossDmg += armorBossChip(s, q.cat);
+      if (Math.random() < doubleBossChance(s)) bossDmg *= 2;
+      s.boss.hp = Math.max(0, s.boss.hp - bossDmg);
+      const theme = THEMES.find(t => t.key === s.run.theme) || THEMES[0];
+      if (s.boss.hp <= 0) {
+        const clearedFloor = s.boss.floor;
+        const bonus = 20 + clearedFloor * 5;
+        s.shards += bonus;
+        s.lifetime.bossesDefeated = (s.lifetime.bossesDefeated || 0) + 1;
+        s.lootLog.unshift({ id: uid(), text: `${s.boss.name} falls! (${clearedFloor > 1 ? "elite " : ""}encounter cleared)`, rarity: "epic", color: "#C1548F", shards: bonus, xp: 0, at: Date.now() });
+        s.boss = nextBoss(s.boss.maxHp, clearedFloor + 1, theme.bossNames);
+      }
+
+      s.lootLog.unshift({ id: uid(), text: `${q.text} (${h}h logged)`, rarity: best.rarity, color: best.color, shards: shardGain, xp: xpGain, at: Date.now() });
+      s.lootLog = s.lootLog.slice(0, 30);
+      s.run.questsDone = (s.run.questsDone || 0) + 1;
+      s.lifetime.questsDone = (s.lifetime.questsDone || 0) + 1;
+      const newly = checkAchievements(s);
+      showToast(`Logged ${h}h — +${xpGain} XP · ${shardGain} shards (${best.rarity})`, best.color);
+      if (newly.length) setTimeout(() => showToast(`🏆 Trophy: ${newly[0].name}`, "#CB9A3E"), 900);
       return s;
     });
   };
@@ -320,136 +774,360 @@ function TheLedger() {
   const removeReward = (id) => setState(prev => ({ ...prev, vault: prev.vault.filter(r => r.id !== id) }));
   const redeem = (r) => {
     setState(prev => {
-      if (prev.shards < r.cost) { showToast("Not enough shards", "#B0678F"); return prev; }
-      showToast(`Redeemed: ${r.text}`, "#6FA88C");
-      return { ...prev, shards: prev.shards - r.cost };
+      const cost = Math.round(r.cost * vaultDiscountMult(prev));
+      if (prev.shards < cost) { showToast("Not enough shards", "#8e2b2b"); return prev; }
+      showToast(`Redeemed: ${r.text}`, "#4C8A57");
+      return { ...prev, shards: prev.shards - cost };
     });
   };
 
+  const buyLoadoutItem = (id) => {
+    setState(prev => {
+      const def = LOADOUT_ITEMS.find(i => i.id === id);
+      if (!def || prev.ownedLoadout.includes(id)) return prev;
+      if (prev.shards < def.cost) { showToast("Not enough shards", "#8e2b2b"); return prev; }
+      showToast(`Acquired: ${def.name}`, "#CB9A3E");
+      return { ...prev, shards: prev.shards - def.cost, ownedLoadout: [...prev.ownedLoadout, id] };
+    });
+  };
+  const equipLoadout = (slot, itemId) => setState(prev => ({ ...prev, loadout: { ...prev.loadout, [slot]: itemId } }));
+
+  const buyArmorPiece = (setKey, slotName) => {
+    setState(prev => {
+      const set = ARMOR_SETS.find(a => a.key === setKey);
+      const pieceKey = `${setKey}:${slotName}`;
+      if (!set || prev.armor.owned.includes(pieceKey)) return prev;
+      if (!prev.seenThemes.includes(setKey)) { showToast("Not yet discovered — experience that theme first", "#8e2b2b"); return prev; }
+      if (prev.shards < set.cost) { showToast("Not enough shards", "#8e2b2b"); return prev; }
+      const s = structuredClone(prev);
+      s.shards -= set.cost;
+      s.armor.owned.push(pieceKey);
+      if (!s.armor.equippedSet) s.armor.equippedSet = setKey;
+      const newly = checkAchievements(s);
+      showToast(`Acquired: ${set.pieces[slotName]}`, "#CB9A3E");
+      if (newly.length) setTimeout(() => showToast(`🏆 Trophy: ${newly[0].name}`, "#CB9A3E"), 500);
+      return s;
+    });
+  };
+  const equipArmorSet = (setKey) => setState(prev => ({ ...prev, armor: { ...prev.armor, equippedSet: setKey } }));
+
+  const confirmTransition = (keepsakeId) => {
+    setState(prev => {
+      if (!prev.run.transition) return prev;
+      const s = structuredClone(prev);
+      if (s.run.transition.result === "victory") {
+        const key = s.run.transition.oldThemeKey;
+        if (key && !s.clearedThemes.includes(key)) s.clearedThemes.push(key);
+        if (key && !s.unlockedSkins.includes(key)) s.unlockedSkins.push(key);
+      }
+      const nextTheme = pickTheme(s.run.theme);
+      s.boss = { name: nextTheme.bossNames[0], hp: BASE_BOSS_HP, maxHp: BASE_BOSS_HP, floor: 1 };
+      s.run = { weekKey: mondayKey(new Date()), theme: nextTheme.key, questsDone: 0, transition: null, scaledStart: false };
+      if (!s.seenThemes.includes(nextTheme.key)) s.seenThemes.push(nextTheme.key);
+      const def = keepsakeId ? LOADOUT_ITEMS.find(i => i.id === keepsakeId) : null;
+      s.ownedLoadout = def ? [def.id] : [];
+      s.loadout = def ? (def.slot === "weapon" ? { weapon: def.id, acc1: null, acc2: null } : { weapon: null, acc1: def.id, acc2: null }) : { weapon: null, acc1: null, acc2: null };
+      checkAchievements(s);
+      showToast(`A new tale begins: ${nextTheme.name}`, nextTheme.accent);
+      return s;
+    });
+  };
+
+  const exportSave = () => {
+    const blob = new Blob([JSON.stringify(state, null, 2)], { type: "application/json" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url; a.download = `ledger-save-${todayStr().replace(/\s+/g, "-")}.json`;
+    document.body.appendChild(a); a.click(); document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+    showToast("Save downloaded", "#4C8A57");
+  };
+
+  const handleImportFile = (e) => {
+    const file = e.target.files[0]; if (!file) return;
+    const reader = new FileReader();
+    reader.onload = () => {
+      try {
+        const parsed = JSON.parse(reader.result);
+        if (!window.confirm("Load this save? It will overwrite your current progress on this device.")) return;
+        setState({ ...defaultState(), ...parsed });
+        showToast("Save loaded", "#4C8A57");
+      } catch (err) { showToast("Invalid save file", "#8e2b2b"); }
+    };
+    reader.readAsText(file);
+    e.target.value = "";
+  };
+
+  const connectSync = async () => {
+    if (!tokenInput.trim()) return;
+    const t = tokenInput.trim();
+    localStorage.setItem(TOKEN_KEY, t);
+    setSyncStatus("saving");
+    const cloud = await pullFromGist(t);
+    let ok;
+    if (cloud) { setState(prev => ({ ...defaultState(), ...cloud })); ok = true; }
+    else { ok = await pushToGist(t, state); }
+    setSyncStatus(ok ? "synced" : "error");
+    setTokenInput("");
+    showToast(ok ? "Cloud sync connected" : "Couldn't reach GitHub — check the token", ok ? "#4C8A57" : "#8e2b2b");
+  };
+  const disconnectSync = () => {
+    localStorage.removeItem(TOKEN_KEY); localStorage.removeItem(GISTID_KEY); setSyncStatus("off");
+    showToast("Cloud sync disconnected (this device only now)", "#9B9077");
+  };
+
   if (!loaded || !state) {
-    return <div style={{ background: "#12121A", minHeight: "100vh", display: "flex", alignItems: "center", justifyContent: "center", color: "#8B8378", fontFamily: "monospace" }}>loading the ledger…</div>;
+    return <div style={{ background: "#170f09", minHeight: "100vh", display: "flex", alignItems: "center", justifyContent: "center", color: "#CB9A3E", fontFamily: "'MedievalSharp', serif", fontSize: "16px" }}>unrolling the ledger…</div>;
   }
 
-  const charLevel = Math.floor(Object.values(state.stats).reduce((a, s) => a + xpToLevel(s.xp), 0) / 5);
+  const charLevel = Math.floor(Object.values(state.stats).reduce((a, s) => a + xpToLevel(s.xp), 0) / Object.keys(STATS).length);
+  const liveTheme = THEMES.find(t => t.key === state.run.theme) || THEMES[0];
+  const theme = state.activeSkin ? (THEMES.find(t => t.key === state.activeSkin) || liveTheme) : liveTheme;
+  const parchment = cardMaterial(theme);
+  const plaque = plaqueMaterial(theme);
+  const dow = new Date().getDay();
+  const dayLabel = DAY_LABELS[dow];
+  const daysUntilBoss = dow === 0 ? 6 : Math.max(0, 6 - dow);
+  const equippedArmor = activeArmorBonus(state);
 
   return (
-    <div style={{ minHeight: "100vh", background: "radial-gradient(ellipse at top, #1A1A24 0%, #0F0F16 60%, #0B0B10 100%)", color: "#E4DECB", fontFamily: "'Inter', system-ui, sans-serif", paddingBottom: "80px" }}>
+    <div style={{ minHeight: "100vh", background: `radial-gradient(ellipse at top, ${theme.accent}26 0%, transparent 45%), radial-gradient(ellipse at top, ${theme.pageBg[0]} 0%, ${theme.pageBg[1]} 55%, ${theme.pageBg[2]} 100%)`, color: "#f1e2bd", fontFamily: "'Nunito', system-ui, sans-serif", paddingBottom: "80px", transition: "background 0.4s ease" }}>
       <style>{`
-        @import url('https://fonts.googleapis.com/css2?family=Spectral:wght@400;600;700&family=JetBrains+Mono:wght@400;500;700&family=Inter:wght@400;500;600&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600&family=JetBrains+Mono:wght@400;500;700&family=MedievalSharp&family=Monoton&family=Nunito:wght@400;600;700;800&family=Orbitron:wght@400;600;700&family=Pirata+One&family=Rye&display=swap');
         * { box-sizing: border-box; }
-        .disp { font-family: 'Spectral', serif; }
+        .disp { font-family: '${theme.font}', 'MedievalSharp', serif; }
         .mono { font-family: 'JetBrains Mono', monospace; }
-        .card { background: linear-gradient(160deg, #1C1C28 0%, #17171F 100%); border: 1px solid #2B2B38; border-radius: 10px; }
-        .btn { cursor: pointer; transition: all .15s ease; }
-        .btn:hover { filter: brightness(1.15); }
-        .btn:active { transform: scale(0.97); }
-        input, textarea, select { background: #14141C; border: 1px solid #2B2B38; color: #E4DECB; border-radius: 6px; padding: 6px 8px; font-family: inherit; font-size: 13px; }
-        input:focus, textarea:focus, select:focus { outline: 1px solid #6FA88C; }
+        .btn { cursor: pointer; transition: all .12s ease; }
+        .btn:hover { filter: brightness(1.1); }
+        .btn:active { transform: translateY(2px); box-shadow: none !important; }
+        .lift:hover { transform: translateY(-2px); }
+        .lift { transition: transform .15s ease; }
+        input, textarea, select { background: ${theme.cardBg[0]}; border: 2px solid ${theme.cardBorder}; color: #3c2a16; border-radius: 6px; padding: 6px 8px; font-family: inherit; font-size: 13px; }
+        input:focus, textarea:focus, select:focus { outline: 2px solid #4C8A57; }
         @keyframes flicker { 0%{opacity:0} 15%{opacity:1} 18%{opacity:.3} 22%{opacity:1} 100%{opacity:1} }
         @keyframes pulse { 0%{opacity:1} 50%{opacity:.4} 100%{opacity:1} }
+        @keyframes torch { 0%,100%{opacity:1; transform:scale(1)} 50%{opacity:.6; transform:scale(0.85)} }
+        @keyframes popIn { 0%{transform:scale(0.85); opacity:0} 100%{transform:scale(1); opacity:1} }
+        ::-webkit-scrollbar { height: 6px; }
+        .app-shell { max-width: 640px; margin: 0 auto; }
+        .layout-grid { display: block; }
+        .stat-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+        @media (min-width: 900px) {
+          .app-shell { max-width: 1080px; }
+          .layout-grid { display: grid; grid-template-columns: 300px 1fr; gap: 22px; align-items: start; }
+          .status-rail { position: sticky; top: 16px; }
+          .stat-grid { grid-template-columns: 1fr; }
+        }
       `}</style>
 
-      <div style={{ padding: "22px 18px 14px", borderBottom: "1px solid #23232F" }}>
+      <div className="app-shell" style={{ position: "relative" }}>
+
+      {state.run.transition && (
+        <div style={{ position: "fixed", inset: 0, background: "rgba(10,7,4,0.9)", zIndex: 50, display: "flex", alignItems: "center", justifyContent: "center", padding: "20px" }}>
+          <div style={{ maxWidth: "460px", width: "100%", ...plaque, padding: "20px", maxHeight: "85vh", overflowY: "auto", animation: "popIn .2s ease" }}>
+            <div className="disp" style={{ fontSize: "22px", color: theme.accent, marginBottom: "6px" }}>
+              {state.run.transition.result === "victory" ? "Victory!" : "The Boss Slips Away…"}
+            </div>
+            <div style={{ fontSize: "13px", color: "#d8c9a3", marginBottom: "14px" }}>
+              {state.run.transition.oldThemeName} has ended — {state.run.transition.questsDone} quests completed this run.
+              {state.run.transition.result === "victory" && " A cosmetic skin for this theme is now unlocked forever."}
+            </div>
+            {state.run.transition.ownedLoadout.length > 0 ? (
+              <>
+                <div className="mono" style={{ fontSize: "11px", color: "#b9ac8c", marginBottom: "8px" }}>CHOOSE ONE KEEPSAKE TO CARRY FORWARD</div>
+                <div style={{ display: "flex", flexDirection: "column", gap: "8px", marginBottom: "14px" }}>
+                  {state.run.transition.ownedLoadout.map(iid => {
+                    const def = LOADOUT_ITEMS.find(i => i.id === iid);
+                    if (!def) return null;
+                    return (
+                      <div key={iid} className="btn lift" onClick={() => confirmTransition(iid)} style={{ padding: "10px", ...parchment, display: "flex", alignItems: "center", gap: "10px" }}>
+                        <div style={badge(theme.accent)}><Icon name={def.icon} size={14} color={theme.accent} /></div>
+                        <div style={{ flex: 1 }}>
+                          <div style={{ fontWeight: 700, fontSize: "13px" }}>{def.name}</div>
+                          <div className="mono" style={{ fontSize: "10px", color: "#7a6440" }}>{def.desc}</div>
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+                <div className="btn" onClick={() => confirmTransition(null)} style={{ ...btnGhost, color: "#f1e2bd", borderColor: "#6b4a26", textAlign: "center", display: "block" }}>Keep none — full wipe</div>
+              </>
+            ) : (
+              <div className="btn btn3d" onClick={() => confirmTransition(null)} style={{ ...btnPrimary, textAlign: "center" }}>Begin the next tale</div>
+            )}
+          </div>
+        </div>
+      )}
+
+      <div className="layout-grid">
+      <div className="status-rail">
+      <div style={{ padding: "22px 18px 14px", borderBottom: "3px double #6b4a26" }}>
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline" }}>
-          <div>
-            <div className="disp" style={{ fontSize: "22px", fontWeight: 700 }}>The Ledger</div>
-            <div className="mono" style={{ fontSize: "11px", color: "#7A7566", marginTop: "2px" }}>character level {charLevel} · streak {state.streak} {state.streak > 0 ? "🔥" : ""}</div>
+          <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+            <Icon name="flame" size={18} color={theme.accent} style={{ animation: "torch 1.6s ease-in-out infinite" }} />
+            <div>
+              <div className="disp" style={{ fontSize: "26px", fontWeight: 400, color: theme.accent, textShadow: "1px 1px 0 #000, 0 0 14px rgba(203,154,62,0.35)" }}>{theme.logLabel}</div>
+              <div className="mono" style={{ fontSize: "11px", color: "#b9ac8c", marginTop: "2px" }}>lvl {charLevel} · streak {state.streak}{state.streak > 0 ? " 🔥" : ""} · {liveTheme.name} · {dayLabel}</div>
+            </div>
           </div>
-          <div style={{ display: "flex", alignItems: "center", gap: "6px" }} className="mono">
-            <Icon name="gem" size={16} color="#5C8FB0" />
-            <span style={{ fontSize: "16px", fontWeight: 700 }}>{state.shards}</span>
+          <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+            <div style={{ display: "flex", alignItems: "center", gap: "6px", background: "linear-gradient(180deg,#2c2015,#1d150e)", border: `2px solid ${theme.accent}`, borderRadius: "999px", padding: "5px 12px" }} className="mono">
+              <Icon name="gem" size={15} color="#3E7FAE" />
+              <span style={{ fontSize: "15px", fontWeight: 700, color: "#f1e2bd" }}>{state.shards}</span>
+            </div>
+            <div className="btn" onClick={() => setSettingsOpen(v => !v)} style={{ width: "30px", height: "30px", borderRadius: "50%", display: "flex", alignItems: "center", justifyContent: "center", background: "linear-gradient(180deg,#2c2015,#1d150e)", border: "2px solid #6b4a26" }}>
+              <Icon name="cog" size={14} color="#b9ac8c" />
+            </div>
           </div>
         </div>
-        <div style={{ marginTop: "12px", padding: "10px 12px", borderRadius: "8px", background: "#1A1A24", border: "1px solid #2B2B38", animation: "flicker 1.2s ease" }}>
-          <div style={{ fontSize: "10px", letterSpacing: "1.5px", color: "#7A7566", marginBottom: "3px" }} className="mono">TODAY'S SIGIL</div>
-          <div style={{ fontSize: "13px", color: "#C9A876" }}>{state.sigil.text}</div>
+
+        {settingsOpen && (
+          <div style={{ marginTop: "10px", padding: "12px", ...plaque, animation: "popIn .15s ease" }}>
+            <div className="mono" style={{ fontSize: "10px", letterSpacing: "1px", color: "#b9ac8c", marginBottom: "6px" }}>SAVE &amp; SYNC</div>
+            <div style={{ display: "flex", gap: "8px", marginBottom: "10px", flexWrap: "wrap" }}>
+              <div className="btn" onClick={exportSave} style={{ ...btnGhost, color: "#f1e2bd", borderColor: "#6b4a26", display: "flex", alignItems: "center", gap: "5px" }}><Icon name="download" size={13} color="#f1e2bd" /> Download save</div>
+              <div className="btn" onClick={() => fileInputRef.current && fileInputRef.current.click()} style={{ ...btnGhost, color: "#f1e2bd", borderColor: "#6b4a26", display: "flex", alignItems: "center", gap: "5px" }}><Icon name="upload" size={13} color="#f1e2bd" /> Load save</div>
+              <input ref={fileInputRef} type="file" accept="application/json" style={{ display: "none" }} onChange={handleImportFile} />
+            </div>
+            <div className="mono" style={{ fontSize: "10px", letterSpacing: "1px", color: "#b9ac8c", marginBottom: "6px", display: "flex", alignItems: "center", gap: "5px" }}><Icon name="cloud" size={12} color="#b9ac8c" /> CLOUD SYNC (GITHUB GIST)</div>
+            {syncStatus === "off" ? (
+              <>
+                <div style={{ fontSize: "11px", color: "#d8c9a3", marginBottom: "6px" }}>Paste a GitHub token (classic, "gist" scope) to auto-sync between devices. Stored only in this browser, sent only to GitHub.</div>
+                <div style={{ display: "flex", gap: "6px" }}>
+                  <input type="password" placeholder="ghp_…" value={tokenInput} onChange={e => setTokenInput(e.target.value)} style={{ flex: 1 }} />
+                  <div className="btn btn3d" onClick={connectSync} style={{ ...btnPrimary, padding: "6px 10px", fontSize: "11px" }}>Connect</div>
+                </div>
+              </>
+            ) : (
+              <div style={{ display: "flex", alignItems: "center", gap: "8px", fontSize: "11px" }} className="mono">
+                <span style={{ color: syncStatus === "error" ? "#d98a8a" : "#8fbf98" }}>
+                  {syncStatus === "saving" ? "syncing…" : syncStatus === "error" ? "sync error — check token" : "connected ✓"}
+                </span>
+                <div className="btn" onClick={disconnectSync} style={{ ...btnGhost, color: "#d8c9a3", borderColor: "#6b4a26", padding: "4px 8px", fontSize: "10px", marginLeft: "auto" }}>Disconnect</div>
+              </div>
+            )}
+          </div>
+        )}
+
+        <div style={{ marginTop: "12px", padding: "10px 12px", borderRadius: "8px", ...plaque, animation: "flicker 1.2s ease" }}>
+          <div style={{ fontSize: "10px", letterSpacing: "1.5px", color: "#b9ac8c" }} className="mono">TODAY'S OMEN</div>
+          <div style={{ fontSize: "13px", color: theme.accent, marginTop: "2px" }}>{state.sigil.text}</div>
         </div>
+        {equippedArmor && (
+          <div style={{ marginTop: "8px", fontSize: "11px", color: "#c9b17a" }} className="mono">
+            {equippedArmor.set.name} ({equippedArmor.tier}/3): {equippedArmor.label}
+          </div>
+        )}
+        {state.run.scaledStart && (
+          <div style={{ marginTop: "8px", fontSize: "11px", color: "#8fbf98" }} className="mono">
+            first run trimmed to fit the days left this week — full-strength runs start next Monday
+          </div>
+        )}
         {state.staticMeter > 0 && (
-          <div style={{ marginTop: "8px", fontSize: "11px", color: "#B0678F" }} className="mono">
-            static building — {state.staticMeter}/3. finish today's board to clear it. no lost progress, just friction.
+          <div style={{ marginTop: "8px", fontSize: "11px", color: "#d98a8a", display: "flex", alignItems: "center", gap: "4px" }} className="mono">
+            curse building — {"☠".repeat(state.staticMeter)}{"·".repeat(3 - state.staticMeter)} · finish today's board to lift it, no lost progress
           </div>
         )}
       </div>
 
-      <div style={{ padding: "16px 18px", display: "grid", gridTemplateColumns: "1fr 1fr", gap: "10px" }}>
+      <div className="stat-grid" style={{ padding: "16px 18px" }}>
         {Object.entries(STATS).map(([key, def]) => {
           const s = state.stats[key];
           const lvl = xpToLevel(s.xp), pct = xpInLevel(s.xp);
           return (
-            <div key={key} className="card" style={{ padding: "10px" }}>
-              <div style={{ display: "flex", alignItems: "center", gap: "6px", marginBottom: "6px" }}>
-                <Icon name={def.icon} size={14} color={def.color} />
-                <span style={{ fontSize: "12px", fontWeight: 600 }}>{def.label}</span>
-                <span className="mono" style={{ fontSize: "10px", color: "#7A7566", marginLeft: "auto" }}>Lv{lvl}</span>
+            <div key={key} className="lift" style={{ padding: "10px", ...parchment }}>
+              <div style={{ display: "flex", alignItems: "center", gap: "8px", marginBottom: "6px" }}>
+                <div style={badge(def.color)}><Icon name={def.icon} size={14} color={def.color} /></div>
+                <span style={{ fontSize: "12px", fontWeight: 800 }}>{def.label}</span>
+                <span className="mono" style={{ fontSize: "10px", color: "#7a6440", marginLeft: "auto", background: "#e2cd97", border: "1px solid #b3925a", borderRadius: "4px", padding: "1px 5px" }}>Lv{lvl}</span>
               </div>
-              <div style={{ height: "5px", background: "#0F0F16", borderRadius: "3px", overflow: "hidden" }}>
-                <div style={{ width: `${pct}%`, height: "100%", background: def.color, transition: "width .4s" }} />
+              <div style={{ height: "8px", background: "#c9b17a", borderRadius: "4px", overflow: "hidden", border: "1px solid #9d7f4a" }}>
+                <div style={{ width: `${pct}%`, height: "100%", background: `linear-gradient(90deg, ${def.color}, ${def.color}cc)`, transition: "width .4s" }} />
               </div>
             </div>
           );
         })}
-        <div className="card" style={{ padding: "10px", gridColumn: "1 / 3" }}>
-          <div style={{ fontSize: "10px", color: "#7A7566", marginBottom: "3px" }} className="mono">BOSS: {state.boss.name}</div>
-          <div style={{ height: "6px", background: "#0F0F16", borderRadius: "3px", overflow: "hidden" }}>
-            <div style={{ width: `${(state.boss.hp / state.boss.maxHp) * 100}%`, height: "100%", background: "#B0678F", transition: "width .4s" }} />
+        <div style={{ padding: "12px", gridColumn: "1 / 3", ...plaque, position: "relative" }}>
+          <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+            <div className="mono" style={{ fontSize: "10px", color: "#b9ac8c", letterSpacing: "1px" }}>{state.boss.floor > 1 ? `ELITE ENCOUNTER ${state.boss.floor}` : "THIS WEEK'S BOSS"} · {daysUntilBoss === 0 ? "today is Boss Day" : `${daysUntilBoss}d to Boss Day`}</div>
+            <Icon name="skull" size={16} color={theme.accent2} />
           </div>
-          <div className="mono" style={{ fontSize: "10px", color: "#7A7566", marginTop: "3px" }}>{state.boss.hp}/{state.boss.maxHp} hp</div>
+          <div className="disp" style={{ fontSize: "16px", color: "#f1e2bd", margin: "2px 0 6px" }}>{state.boss.name}</div>
+          <div style={{ height: "9px", background: "#3a2a1a", borderRadius: "4px", overflow: "hidden", border: "1px solid #6b4a26" }}>
+            <div style={{ width: `${(state.boss.hp / state.boss.maxHp) * 100}%`, height: "100%", background: `linear-gradient(90deg, ${theme.accent2}, ${theme.accent2}aa)`, transition: "width .4s" }} />
+          </div>
+          <div className="mono" style={{ fontSize: "10px", color: "#b9ac8c", marginTop: "4px" }}>{state.boss.hp}/{state.boss.maxHp} hp — daily quests deal the damage</div>
         </div>
       </div>
 
       <div style={{ padding: "0 18px 6px" }}>
-        <div className="card" style={{ padding: "14px", textAlign: "center" }}>
-          <div className="mono" style={{ fontSize: "11px", letterSpacing: "1.5px", color: "#7A7566", marginBottom: "8px" }}>DAILY CHALLENGE WHEEL</div>
-          <div style={{ fontSize: "14px", minHeight: "38px", display: "flex", alignItems: "center", justifyContent: "center", padding: "0 8px", color: spinning ? "#9A9585" : "#E4DECB", animation: spinning ? "pulse .12s infinite" : "none" }}>
+        <div style={{ padding: "14px", textAlign: "center", ...parchment }}>
+          <div className="mono" style={{ fontSize: "11px", letterSpacing: "1.5px", color: "#7a6440", marginBottom: "8px" }}>FORTUNE'S WHEEL</div>
+          <div style={{ fontSize: "14px", minHeight: "38px", display: "flex", alignItems: "center", justifyContent: "center", padding: "0 8px", color: spinning ? "#8a7550" : "#3c2a16", animation: spinning ? "pulse .12s infinite" : "none" }}>
             {spinning ? spinLabel : (state.wheel.challenge ? state.wheel.challenge.text : "tap to spin")}
           </div>
           <div style={{ marginTop: "10px" }}>
             {!state.wheel.challenge && !spinning && (
-              <div className="btn" onClick={spinWheel} style={{ display: "inline-block", background: "#6FA88C", color: "#0F0F16", borderRadius: "7px", padding: "8px 16px", fontSize: "12px", fontWeight: 700 }}>Spin the wheel</div>
+              <div className="btn btn3d" onClick={spinWheel} style={btnPrimary}>Spin the wheel</div>
             )}
             {state.wheel.challenge && !state.wheel.done && (
-              <div className="btn" onClick={completeChallenge} style={{ display: "inline-block", background: "#6FA88C", color: "#0F0F16", borderRadius: "7px", padding: "8px 16px", fontSize: "12px", fontWeight: 700 }}>Mark cleared</div>
+              <div className="btn btn3d" onClick={completeChallenge} style={btnPrimary}>Mark cleared</div>
             )}
-            {state.wheel.done && <span className="mono" style={{ fontSize: "11px", color: "#7A7566" }}>cleared today ✓</span>}
+            {state.wheel.done && <span className="mono" style={{ fontSize: "11px", color: "#7a6440" }}>cleared today ✓</span>}
           </div>
         </div>
       </div>
 
-      <div style={{ display: "flex", gap: "2px", padding: "0 12px", borderBottom: "1px solid #23232F", overflowX: "auto" }}>
-        {[["board", "Board", "sword"], ["bonus", "Bonus", "sparkles"], ["side", "Side Quests", "skull"], ["vault", "Vault", "gem"], ["log", "Loot Log", "sparkles"], ["pool", "Edit Pool", "shield"]].map(([key, label, iconName]) => (
-          <div key={key} onClick={() => setTab(key)} className="btn" style={{ display: "flex", alignItems: "center", gap: "5px", padding: "10px", fontSize: "12px", whiteSpace: "nowrap", color: tab === key ? "#E4DECB" : "#7A7566", borderBottom: tab === key ? "2px solid #6FA88C" : "2px solid transparent" }}>
+      </div>
+
+      <div className="main-col">
+      <div style={{ display: "flex", gap: "2px", padding: "0 12px", borderBottom: "3px double #6b4a26", overflowX: "auto" }}>
+        {[["board", "Board", "sword"], ["bonus", "Bonus", "sparkles"], ["side", "Side Quests", "skull"], ["gear", "Equipment", "crown"], ["vault", "Vault", "chest"]].map(([key, label, iconName]) => (
+          <div key={key} onClick={() => setTab(key)} className="btn" style={{ display: "flex", alignItems: "center", gap: "5px", padding: "10px", fontSize: "12px", fontWeight: 700, whiteSpace: "nowrap", color: tab === key ? theme.accent : "#8a7550", borderBottom: tab === key ? `3px solid ${theme.accent}` : "3px solid transparent" }}>
             <Icon name={iconName} size={13} /> {label}
           </div>
         ))}
+        <div onClick={() => setMoreOpen(true)} className="btn" style={{ display: "flex", alignItems: "center", gap: "5px", padding: "10px", fontSize: "12px", fontWeight: 700, whiteSpace: "nowrap", color: "#8a7550", borderBottom: "3px solid transparent", marginLeft: "auto" }}>
+          <Icon name="scroll" size={13} /> More
+        </div>
       </div>
 
       <div style={{ padding: "16px 18px" }}>
         {tab === "board" && (
           <div style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
-            {state.dailyQuests.length === 0 && <div style={{ color: "#7A7566", fontSize: "13px" }}>No quests drawn — add some in Edit Pool.</div>}
+            {state.pendingFork && (
+              <div style={{ padding: "12px", borderRadius: "10px", background: "linear-gradient(160deg, #3a2a4a, #251a33)", border: "2px solid #7c5a9e", color: "#e9dcff", animation: "popIn .2s ease" }}>
+                <div style={{ fontWeight: 800, marginBottom: "4px" }}>⚡ {state.pendingFork.prompt}</div>
+                <div style={{ display: "flex", gap: "8px", marginTop: "8px", flexWrap: "wrap" }}>
+                  <div className="btn btn3d" onClick={() => resolveFork("safe")} style={{ ...btnGhost, background: "#3a2a4a", color: "#e9dcff", border: "2px solid #9d7fc0" }}>Play it safe (+{state.pendingFork.safeAmt} shards)</div>
+                  <div className="btn btn3d" onClick={() => resolveFork("risk")} style={{ ...btnPrimary, background: "linear-gradient(180deg, #7c5a9e, #5a3f78)", boxShadow: "0 3px 0 #3a2850" }}>Push your luck (50/50 for +{state.pendingFork.riskWin})</div>
+                </div>
+              </div>
+            )}
+            {state.dailyQuests.length === 0 && <div style={{ color: "#8a7550", fontSize: "13px" }}>No quests drawn — add some in Edit Pool.</div>}
             {state.dailyQuests.map(q => {
-              const def = STATS[q.cat];
+              const def = STATS[q.cat] || STATS.craft;
               const boosted = state.sigil.stat === q.cat;
               return (
-                <div key={q.uid} className="card" style={{ padding: "12px", opacity: q.stage === "done" ? 0.45 : 1, display: "flex", alignItems: "flex-start", gap: "10px" }}>
-                  <Icon name={def.icon} size={16} color={def.color} style={{ marginTop: "2px" }} />
+                <div key={q.uid} className="lift" style={{ padding: "12px", opacity: q.stage === "done" ? 0.55 : 1, display: "flex", alignItems: "flex-start", gap: "10px", ...parchment }}>
+                  <div style={badge(def.color)}><Icon name={def.icon} size={15} color={def.color} /></div>
                   <div style={{ flex: 1 }}>
-                    <div style={{ fontSize: "13px", textDecoration: q.stage === "done" ? "line-through" : "none" }}>{q.text}</div>
-                    <div className="mono" style={{ fontSize: "10px", color: "#7A7566" }}>{def.label} · {q.xp} xp{boosted ? " ×2" : ""}</div>
-                    {q.stage === "new" && <div style={{ fontSize: "11px", color: "#9A9585", marginTop: "4px", fontStyle: "italic" }}>start with: {q.ignition}</div>}
+                    <div style={{ fontSize: "13px", fontWeight: 600, textDecoration: q.stage === "done" ? "line-through" : "none" }}>{q.text}</div>
+                    <div className="mono" style={{ fontSize: "10px", color: "#7a6440" }}>{def.label} · {q.xp} xp{boosted ? " ×2" : ""}</div>
+                    {q.stage === "new" && <div style={{ fontSize: "11px", color: "#8a7550", marginTop: "4px", fontStyle: "italic" }}>start with: {q.ignition}</div>}
                   </div>
-                  <div style={{ display: "flex", flexDirection: "column", gap: "6px", minWidth: "88px" }}>
+                  <div style={{ display: "flex", flexDirection: "column", gap: "6px", minWidth: "92px" }}>
                     {q.stage === "new" && (
                       <>
-                        <div className="btn" onClick={() => igniteQuest(q.uid)} style={{ border: "1px solid #2B2B38", color: "#9A9585", borderRadius: "6px", padding: "6px 8px", fontSize: "11px", textAlign: "center" }}>Just start</div>
-                        <div className="btn" onClick={() => completeQuest(q.uid)} style={{ background: "#6FA88C", color: "#0F0F16", borderRadius: "6px", padding: "6px 8px", fontSize: "11px", fontWeight: 600, textAlign: "center" }}>Done</div>
+                        <div className="btn" onClick={() => igniteQuest(q.uid)} style={{ ...btnGhost, padding: "6px 8px", fontSize: "11px" }}>Just start</div>
+                        <div className="btn btn3d" onClick={() => completeQuest(q.uid)} style={{ ...btnPrimary, padding: "6px 8px", fontSize: "11px" }}>Done</div>
                       </>
                     )}
                     {q.stage === "ignited" && (
-                      <div className="btn" onClick={() => completeQuest(q.uid)} style={{ background: "#6FA88C", color: "#0F0F16", borderRadius: "6px", padding: "6px 8px", fontSize: "11px", fontWeight: 600, textAlign: "center" }}>Finish it</div>
+                      <div className="btn btn3d" onClick={() => completeQuest(q.uid)} style={{ ...btnPrimary, padding: "6px 8px", fontSize: "11px" }}>Finish it</div>
                     )}
                     {q.stage === "done" && (
-                      <div className="btn" onClick={() => completeQuest(q.uid, true)} style={{ border: "1px solid #2B2B38", color: "#9A9585", borderRadius: "6px", padding: "6px 8px", fontSize: "10px", textAlign: "center" }}>Push further</div>
+                      <div className="btn" onClick={() => completeQuest(q.uid, true)} style={{ ...btnGhost, padding: "6px 8px", fontSize: "10px" }}>Push further</div>
                     )}
                   </div>
                 </div>
@@ -460,17 +1138,17 @@ function TheLedger() {
 
         {tab === "bonus" && (
           <div style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
-            <div style={{ fontSize: "12px", color: "#7A7566" }}>Never mandatory, never competes with the daily board. Pure upside.</div>
+            <div style={{ fontSize: "12px", color: "#b9ac8c" }}>Never mandatory, never competes with the daily board. Pure upside.</div>
             {state.bonusPool.map(b => {
-              const def = STATS[b.cat];
+              const def = STATS[b.cat] || STATS.craft;
               return (
-                <div key={b.id} className="card" style={{ padding: "12px", display: "flex", alignItems: "center", gap: "10px" }}>
-                  <Icon name={def.icon} size={16} color={def.color} />
+                <div key={b.id} className="lift" style={{ padding: "12px", display: "flex", alignItems: "center", gap: "10px", ...parchment }}>
+                  <div style={badge(def.color)}><Icon name={def.icon} size={15} color={def.color} /></div>
                   <div style={{ flex: 1 }}>
-                    <div style={{ fontSize: "13px" }}>{b.text}</div>
-                    <div className="mono" style={{ fontSize: "10px", color: "#7A7566" }}>{def.label} · {b.xp} xp</div>
+                    <div style={{ fontSize: "13px", fontWeight: 600 }}>{b.text}</div>
+                    <div className="mono" style={{ fontSize: "10px", color: "#7a6440" }}>{def.label} · {b.xp} xp</div>
                   </div>
-                  <div className="btn" onClick={() => completeBonus(b.id)} style={{ background: "#6FA88C", color: "#0F0F16", borderRadius: "6px", padding: "6px 10px", fontSize: "11px", fontWeight: 600 }}>Done</div>
+                  <div className="btn btn3d" onClick={() => completeBonus(b.id)} style={{ ...btnPrimary, padding: "6px 10px", fontSize: "11px" }}>Done</div>
                 </div>
               );
             })}
@@ -479,89 +1157,278 @@ function TheLedger() {
 
         {tab === "side" && (
           <div style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
-            <div className="card" style={{ padding: "10px", display: "flex", gap: "6px" }}>
-              <input placeholder="One-off bigger quest…" value={newSide.text} onChange={e => setNewSide({ ...newSide, text: e.target.value })} style={{ flex: 1 }} />
-              <input type="number" value={newSide.xp} onChange={e => setNewSide({ ...newSide, xp: +e.target.value })} style={{ width: "60px" }} />
-              <div className="btn" onClick={addSideQuest} style={{ background: "#7C93A8", borderRadius: "6px", padding: "6px 10px", display: "flex", alignItems: "center" }}><Icon name="plus" size={14} color="#0F0F16" /></div>
+            <div style={{ padding: "10px", display: "flex", gap: "6px", flexWrap: "wrap", ...parchment }}>
+              <select value={newSide.cat} onChange={e => setNewSide({ ...newSide, cat: e.target.value })}>
+                {Object.entries(STATS).map(([k, v]) => <option key={k} value={k}>{v.label}</option>)}
+              </select>
+              <input placeholder="One-off bigger quest…" value={newSide.text} onChange={e => setNewSide({ ...newSide, text: e.target.value })} style={{ flex: 1, minWidth: "140px" }} />
+              {!newSide.timed && (
+                <input type="number" value={newSide.xp} onChange={e => setNewSide({ ...newSide, xp: +e.target.value })} style={{ width: "60px" }} />
+              )}
+              <label style={{ display: "flex", alignItems: "center", gap: "4px", fontSize: "11px", color: "#5a4326" }}>
+                <input type="checkbox" checked={newSide.timed} onChange={e => setNewSide({ ...newSide, timed: e.target.checked })} style={{ width: "auto", padding: 0 }} />
+                track by hours
+              </label>
+              <div className="btn btn3d" onClick={addSideQuest} style={{ ...btnPrimary, padding: "6px 10px", display: "flex", alignItems: "center" }}><Icon name="plus" size={14} color="#f5ecd2" /></div>
             </div>
-            {state.sideQuests.length === 0 && <div style={{ color: "#7A7566", fontSize: "13px" }}>Side quests are for the bigger, non-daily things.</div>}
-            {state.sideQuests.map(q => (
-              <div key={q.uid} className="card" style={{ padding: "12px", opacity: q.stage === "done" ? 0.45 : 1, display: "flex", alignItems: "center", gap: "10px" }}>
-                <Icon name="skull" size={15} color="#B0678F" />
-                <div style={{ flex: 1 }}>
-                  <div style={{ fontSize: "13px", textDecoration: q.stage === "done" ? "line-through" : "none" }}>{q.text}</div>
-                  <div className="mono" style={{ fontSize: "10px", color: "#7A7566" }}>{q.xp} xp</div>
+            {newSide.timed && <div style={{ fontSize: "11px", color: "#b9ac8c" }}>Timed quests pay ~{TIMED_XP_PER_HOUR} XP and ~{TIMED_SHARD_PER_HOUR} shards per hour, plus a bonus loot roll every 2 hours — log the actual hours when you finish, like a Mythbound task.</div>}
+            {state.sideQuests.length === 0 && <div style={{ color: "#8a7550", fontSize: "13px" }}>Side quests are for the bigger, non-daily things.</div>}
+            {state.sideQuests.map(q => {
+              const def = STATS[q.cat] || STATS.craft;
+              return (
+                <div key={q.uid} className="lift" style={{ padding: "12px", opacity: q.stage === "done" ? 0.55 : 1, display: "flex", alignItems: "center", gap: "10px", ...parchment }}>
+                  <div style={badge(def.color)}><Icon name={def.icon} size={15} color={def.color} /></div>
+                  <div style={{ flex: 1 }}>
+                    <div style={{ fontSize: "13px", fontWeight: 600, textDecoration: q.stage === "done" ? "line-through" : "none" }}>{q.text}</div>
+                    <div className="mono" style={{ fontSize: "10px", color: "#7a6440" }}>
+                      {q.timed
+                        ? (q.stage === "done" ? `${q.hoursLogged}h logged · +${q.xpGained || 0} xp` : `${def.label} · tracked by hours`)
+                        : `${def.label} · ${q.xp} xp`}
+                    </div>
+                  </div>
+                  {q.stage !== "done" ? (
+                    q.timed ? (
+                      <div style={{ display: "flex", alignItems: "center", gap: "6px" }}>
+                        <input type="number" min="0.25" step="0.25" value={hoursInputs[q.uid] ?? "1"} onChange={e => setHoursInputs(prev => ({ ...prev, [q.uid]: e.target.value }))} style={{ width: "52px" }} />
+                        <div className="btn btn3d" onClick={() => completeTimedSide(q.uid, parseFloat(hoursInputs[q.uid] ?? "1") || 1)} style={{ ...btnPrimary, padding: "6px 8px", fontSize: "10px" }}>Log &amp; complete</div>
+                      </div>
+                    ) : (
+                      <div className="btn btn3d" onClick={() => completeSide(q.uid)} style={{ ...btnPrimary, padding: "6px 10px" }}><Icon name="check" size={13} color="#f5ecd2" /></div>
+                    )
+                  ) : (
+                    <div className="btn" onClick={() => removeSide(q.uid)}><Icon name="x" size={14} color="#7a6440" /></div>
+                  )}
                 </div>
-                {q.stage !== "done" ? (
-                  <div className="btn" onClick={() => completeSide(q.uid)} style={{ background: "#6FA88C", color: "#0F0F16", borderRadius: "6px", padding: "6px 10px", fontSize: "11px", fontWeight: 600 }}><Icon name="check" size={13} /></div>
-                ) : (
-                  <div className="btn" onClick={() => removeSide(q.uid)}><Icon name="x" size={14} color="#7A7566" /></div>
-                )}
+              );
+            })}
+          </div>
+        )}
+
+        {tab === "gear" && (
+          <div style={{ display: "flex", flexDirection: "column", gap: "16px" }}>
+            <div>
+              <div className="mono" style={{ fontSize: "11px", letterSpacing: "1px", color: "#b9ac8c", marginBottom: "8px" }}>LOADOUT — weekly, wiped except one keepsake</div>
+              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: "8px", marginBottom: "10px" }}>
+                {["weapon", "acc1", "acc2"].map(slot => {
+                  const itemId = state.loadout[slot];
+                  const def = itemId ? LOADOUT_ITEMS.find(i => i.id === itemId) : null;
+                  return (
+                    <div key={slot} style={{ padding: "8px", ...parchment, textAlign: "center" }}>
+                      <div className="mono" style={{ fontSize: "9px", color: "#7a6440" }}>{slot === "weapon" ? "WEAPON" : "ACCESSORY"}</div>
+                      {def ? (
+                        <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: "4px", marginTop: "4px" }}>
+                          <Icon name={def.icon} size={16} color={theme.accent} />
+                          <div style={{ fontSize: "10px", fontWeight: 700 }}>{def.name}</div>
+                        </div>
+                      ) : <div style={{ fontSize: "10px", color: "#a89264", marginTop: "8px" }}>empty</div>}
+                    </div>
+                  );
+                })}
               </div>
-            ))}
+              {state.ownedLoadout.length > 0 && (
+                <div style={{ marginBottom: "10px" }}>
+                  <div className="mono" style={{ fontSize: "10px", color: "#b9ac8c", marginBottom: "6px" }}>OWNED — tap to equip</div>
+                  <div style={{ display: "flex", flexWrap: "wrap", gap: "6px" }}>
+                    {state.ownedLoadout.map(id => {
+                      const def = LOADOUT_ITEMS.find(i => i.id === id);
+                      if (!def) return null;
+                      const slotKey = def.slot === "weapon" ? "weapon" : (state.loadout.acc1 === id || state.loadout.acc1 === null ? "acc1" : "acc2");
+                      const equipped = state.loadout.weapon === id || state.loadout.acc1 === id || state.loadout.acc2 === id;
+                      return (
+                        <div key={id} className="btn" onClick={() => equipLoadout(def.slot === "weapon" ? "weapon" : (state.loadout.acc1 === id ? "acc1" : (state.loadout.acc2 === id ? "acc2" : (state.loadout.acc1 ? "acc2" : "acc1"))), id)}
+                          style={{ ...btnGhost, borderColor: equipped ? theme.accent : "#b3925a", color: equipped ? theme.accent : "#5a4326", padding: "5px 9px" }}>
+                          {def.name}{equipped ? " ✓" : ""}
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
+              )}
+              <div className="mono" style={{ fontSize: "10px", color: "#b9ac8c", marginBottom: "6px" }}>SHOP</div>
+              <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
+                {LOADOUT_ITEMS.map(item => {
+                  const owned = state.ownedLoadout.includes(item.id);
+                  const affordable = state.shards >= item.cost;
+                  return (
+                    <div key={item.id} className="lift" style={{ padding: "10px", display: "flex", alignItems: "center", gap: "10px", ...parchment, opacity: owned ? 0.6 : 1 }}>
+                      <div style={badge(theme.accent)}><Icon name={item.icon} size={14} color={theme.accent} /></div>
+                      <div style={{ flex: 1 }}>
+                        <div style={{ fontSize: "12px", fontWeight: 700 }}>{item.name} <span className="mono" style={{ fontSize: "9px", color: "#7a6440" }}>({item.slot})</span></div>
+                        <div className="mono" style={{ fontSize: "10px", color: "#7a6440" }}>{item.desc}</div>
+                      </div>
+                      {owned ? <span className="mono" style={{ fontSize: "10px", color: "#4C8A57", fontWeight: 700 }}>Owned</span> : (
+                        <div className="btn btn3d" onClick={() => buyLoadoutItem(item.id)} style={{ ...(affordable ? btnPrimary : btnGhost), padding: "5px 9px", fontSize: "10px" }}>{item.cost} <Icon name="gem" size={10} color={affordable ? "#f5ecd2" : "#7a6440"} style={{ verticalAlign: "-1px" }} /></div>
+                      )}
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+
+            <div>
+              <div className="mono" style={{ fontSize: "11px", letterSpacing: "1px", color: "#b9ac8c", marginBottom: "8px" }}>ARMOR — permanent, set-bonus focused</div>
+              {ARMOR_SETS.map(set => {
+                const count = armorPieceCount(state, set.key);
+                const unlocked = state.seenThemes.includes(set.key);
+                const equipped = state.armor.equippedSet === set.key;
+                const statColor = STATS[set.stat].color;
+                return (
+                  <div key={set.key} className="lift" style={{ padding: "12px", marginBottom: "8px", ...parchment, opacity: unlocked ? 1 : 0.5 }}>
+                    <div style={{ display: "flex", alignItems: "center", gap: "8px", marginBottom: "6px" }}>
+                      <div style={badge(statColor)}><Icon name="helmet" size={14} color={statColor} /></div>
+                      <div style={{ flex: 1 }}>
+                        <div style={{ fontSize: "13px", fontWeight: 700 }}>{set.name}</div>
+                        <div className="mono" style={{ fontSize: "9px", color: "#7a6440" }}>{STATS[set.stat].label} set · {count}/3 owned</div>
+                      </div>
+                      {count >= 2 && (
+                        <div className="btn" onClick={() => equipArmorSet(set.key)} style={{ ...(equipped ? btnPrimary : btnGhost), padding: "5px 9px", fontSize: "10px" }}>{equipped ? "Worn ✓" : "Wear"}</div>
+                      )}
+                    </div>
+                    {!unlocked ? (
+                      <div className="mono" style={{ fontSize: "10px", color: "#8a7550" }}>Undiscovered — appears once you experience a {set.name.includes("Legion") ? "Roman" : ""} run themed after this set.</div>
+                    ) : (
+                      <div style={{ display: "flex", gap: "6px", flexWrap: "wrap" }}>
+                        {Object.entries(set.pieces).map(([slotName, pieceName]) => {
+                          const owned = state.armor.owned.includes(`${set.key}:${slotName}`);
+                          return owned ? (
+                            <span key={slotName} className="mono" style={{ fontSize: "10px", color: "#4C8A57", fontWeight: 700, border: "1px solid #4C8A57", borderRadius: "5px", padding: "3px 6px" }}>{pieceName} ✓</span>
+                          ) : (
+                            <div key={slotName} className="btn" onClick={() => buyArmorPiece(set.key, slotName)} style={{ ...btnGhost, padding: "3px 6px", fontSize: "10px" }}>{pieceName} — {set.cost} <Icon name="gem" size={9} color="#5a4326" style={{ verticalAlign: "-1px" }} /></div>
+                          );
+                        })}
+                      </div>
+                    )}
+                    <div className="mono" style={{ fontSize: "9px", color: "#8a7550", marginTop: "6px" }}>2pc: {set.bonus2.label} · 3pc: {set.bonus3.label}</div>
+                  </div>
+                );
+              })}
+            </div>
           </div>
         )}
 
         {tab === "vault" && (
           <div style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
-            <div className="card" style={{ padding: "10px", display: "flex", gap: "6px" }}>
+            <div style={{ padding: "10px", display: "flex", gap: "6px", ...parchment }}>
               <input placeholder="Reward you can redeem…" value={newReward.text} onChange={e => setNewReward({ ...newReward, text: e.target.value })} style={{ flex: 1 }} />
               <input type="number" value={newReward.cost} onChange={e => setNewReward({ ...newReward, cost: +e.target.value })} style={{ width: "60px" }} />
-              <div className="btn" onClick={addReward} style={{ background: "#7C93A8", borderRadius: "6px", padding: "6px 10px", display: "flex", alignItems: "center" }}><Icon name="plus" size={14} color="#0F0F16" /></div>
+              <div className="btn btn3d" onClick={addReward} style={{ ...btnPrimary, padding: "6px 10px", display: "flex", alignItems: "center" }}><Icon name="plus" size={14} color="#f5ecd2" /></div>
             </div>
-            {state.vault.map(r => (
-              <div key={r.id} className="card" style={{ padding: "12px", display: "flex", alignItems: "center", gap: "10px" }}>
-                <Icon name="gem" size={15} color="#5C8FB0" />
-                <div style={{ flex: 1, fontSize: "13px" }}>{r.text}</div>
-                <div className="mono" style={{ fontSize: "11px", color: "#7A7566" }}>{r.cost}</div>
-                <div className="btn" onClick={() => redeem(r)} style={{ background: state.shards >= r.cost ? "#C9A876" : "#2B2B38", color: state.shards >= r.cost ? "#0F0F16" : "#7A7566", borderRadius: "6px", padding: "6px 10px", fontSize: "11px", fontWeight: 600 }}>Redeem</div>
-                <Icon name="x" size={13} color="#4A4A55" style={{ cursor: "pointer" }} className="btn" onClick={() => removeReward(r.id)} />
-              </div>
-            ))}
+            {state.vault.map(r => {
+              const effCost = Math.round(r.cost * vaultDiscountMult(state));
+              return (
+                <div key={r.id} className="lift" style={{ padding: "12px", display: "flex", alignItems: "center", gap: "10px", ...parchment }}>
+                  <div style={badge("#CB9A3E")}><Icon name="chest" size={15} color="#CB9A3E" /></div>
+                  <div style={{ flex: 1, fontSize: "13px", fontWeight: 600 }}>{r.text}</div>
+                  <div className="mono" style={{ fontSize: "11px", color: "#7a6440" }}>{effCost}{effCost !== r.cost ? <span style={{ textDecoration: "line-through", opacity: 0.6, marginLeft: "4px" }}>{r.cost}</span> : null}</div>
+                  <div className="btn btn3d" onClick={() => redeem(r)} style={{ ...(state.shards >= effCost ? btnPrimary : btnGhost), padding: "6px 10px", fontSize: "11px" }}>Redeem</div>
+                  <Icon name="x" size={13} color="#a89264" style={{ cursor: "pointer" }} className="btn" onClick={() => removeReward(r.id)} />
+                </div>
+              );
+            })}
           </div>
         )}
 
-        {tab === "log" && (
-          <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
-            {state.lootLog.length === 0 && <div style={{ color: "#7A7566", fontSize: "13px" }}>Nothing yet. Complete a quest.</div>}
-            {state.lootLog.map(l => (
-              <div key={l.id} className="card" style={{ padding: "10px 12px", display: "flex", alignItems: "center", gap: "8px" }}>
-                <div style={{ width: "8px", height: "8px", borderRadius: "50%", background: l.color }} />
-                <div style={{ flex: 1, fontSize: "12px" }}>{l.text}</div>
-                <div className="mono" style={{ fontSize: "10px", color: "#7A7566" }}>+{l.xp}xp · {l.shards}sh · {l.rarity}</div>
-              </div>
-            ))}
-          </div>
-        )}
+      </div>
+      </div>
+      </div>
+      </div>
 
-        {tab === "pool" && (
-          <div style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
-            <div className="card" style={{ padding: "10px", display: "flex", gap: "6px", flexWrap: "wrap" }}>
-              <select value={newQuest.cat} onChange={e => setNewQuest({ ...newQuest, cat: e.target.value })}>
-                {Object.entries(STATS).map(([k, v]) => <option key={k} value={k}>{v.label}</option>)}
-              </select>
-              <input placeholder="Quest text…" value={newQuest.text} onChange={e => setNewQuest({ ...newQuest, text: e.target.value })} style={{ flex: 1, minWidth: "120px" }} />
-              <input type="number" value={newQuest.xp} onChange={e => setNewQuest({ ...newQuest, xp: +e.target.value })} style={{ width: "60px" }} />
-              <input placeholder="Ignition step (2-min starter)…" value={newQuest.ignition} onChange={e => setNewQuest({ ...newQuest, ignition: e.target.value })} style={{ flex: 1, minWidth: "160px" }} />
-              <div className="btn" onClick={addPoolQuest} style={{ background: "#7C93A8", borderRadius: "6px", padding: "6px 10px", display: "flex", alignItems: "center" }}><Icon name="plus" size={14} color="#0F0F16" /></div>
+      {moreOpen && (
+        <div style={{ position: "fixed", inset: 0, background: "rgba(10,7,4,0.85)", zIndex: 40, display: "flex", alignItems: "flex-start", justifyContent: "center", padding: "20px", overflowY: "auto" }}>
+          <div style={{ maxWidth: "520px", width: "100%", ...plaque, padding: "16px", animation: "popIn .18s ease" }}>
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "10px" }}>
+              <div className="disp" style={{ fontSize: "18px", color: theme.accent }}>More</div>
+              <div className="btn" onClick={() => setMoreOpen(false)}><Icon name="x" size={16} color="#b9ac8c" /></div>
             </div>
-            <div className="mono" style={{ fontSize: "11px", color: "#7A7566" }}>{state.pool.length} quests in the pool. Each day draws 3, weighted toward whichever stat has fallen behind.</div>
-            {Object.entries(STATS).map(([key, def]) => (
-              <div key={key} style={{ marginTop: "4px" }}>
-                <div style={{ fontSize: "11px", color: def.color, marginBottom: "4px" }} className="mono">{def.label.toUpperCase()}</div>
-                {state.pool.filter(q => q.cat === key).map(q => (
-                  <div key={q.id} style={{ fontSize: "12px", color: "#B5AF9C", padding: "3px 0", display: "flex", justifyContent: "space-between" }}>
-                    <span>{q.text}</span><span className="mono" style={{ color: "#7A7566" }}>{q.xp}xp</span>
+            <div style={{ display: "flex", gap: "2px", borderBottom: "3px double #6b4a26", marginBottom: "14px" }}>
+              {[["log", "Loot Log", "sparkles"], ["trophies", "Trophies", "trophy"], ["pool", "Edit Pool", "scroll"]].map(([key, label, iconName]) => (
+                <div key={key} onClick={() => setMoreTab(key)} className="btn" style={{ display: "flex", alignItems: "center", gap: "5px", padding: "8px 10px", fontSize: "12px", fontWeight: 700, color: moreTab === key ? theme.accent : "#8a7550", borderBottom: moreTab === key ? `3px solid ${theme.accent}` : "3px solid transparent" }}>
+                  <Icon name={iconName} size={13} /> {label}
+                </div>
+              ))}
+            </div>
+
+            {moreTab === "log" && (
+              <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
+                {state.lootLog.length === 0 && <div style={{ color: "#d8c9a3", fontSize: "13px" }}>Nothing yet. Complete a quest.</div>}
+                {state.lootLog.map(l => (
+                  <div key={l.id} style={{ padding: "10px 12px", display: "flex", alignItems: "center", gap: "8px", ...parchment }}>
+                    <div style={{ width: "9px", height: "9px", borderRadius: "50%", background: l.color, border: "1px solid rgba(0,0,0,0.2)" }} />
+                    <div style={{ flex: 1, fontSize: "12px" }}>{l.text}</div>
+                    <div className="mono" style={{ fontSize: "10px", color: "#7a6440" }}>+{l.xp}xp · {l.shards}sh · {l.rarity}</div>
                   </div>
                 ))}
               </div>
-            ))}
+            )}
+
+            {moreTab === "trophies" && (
+              <div style={{ display: "flex", flexDirection: "column", gap: "16px" }}>
+                <div>
+                  <div className="mono" style={{ fontSize: "11px", letterSpacing: "1px", color: "#b9ac8c", marginBottom: "8px" }}>COSMETIC SKINS — visual only, unlocked forever after clearing a themed run</div>
+                  <div style={{ display: "flex", flexWrap: "wrap", gap: "8px" }}>
+                    <div className="btn" onClick={() => setState(prev => ({ ...prev, activeSkin: null }))} style={{ ...(state.activeSkin === null ? btnPrimary : btnGhost), padding: "6px 10px", fontSize: "11px" }}>Live rotation</div>
+                    {state.unlockedSkins.map(key => {
+                      const t = THEMES.find(x => x.key === key);
+                      if (!t) return null;
+                      const active = state.activeSkin === key;
+                      return (
+                        <div key={key} className="btn" onClick={() => setState(prev => ({ ...prev, activeSkin: key }))} style={{ ...(active ? btnPrimary : btnGhost), padding: "6px 10px", fontSize: "11px" }}>{t.emoji} {t.name}</div>
+                      );
+                    })}
+                    {state.unlockedSkins.length === 0 && <div style={{ fontSize: "11px", color: "#d8c9a3" }}>Clear a themed run's boss to unlock its permanent look.</div>}
+                  </div>
+                </div>
+                <div>
+                  <div className="mono" style={{ fontSize: "11px", letterSpacing: "1px", color: "#b9ac8c", marginBottom: "8px" }}>TROPHY CASE — {state.achievements.length}/{ACHIEVEMENTS.length} earned</div>
+                  <div style={{ display: "flex", flexDirection: "column", gap: "6px" }}>
+                    {ACHIEVEMENTS.map(a => {
+                      const earned = state.achievements.includes(a.id);
+                      return (
+                        <div key={a.id} style={{ padding: "10px 12px", display: "flex", alignItems: "center", gap: "10px", ...parchment, opacity: earned ? 1 : 0.45 }}>
+                          <Icon name="trophy" size={15} color={earned ? "#CB9A3E" : "#7a6440"} />
+                          <div style={{ flex: 1 }}>
+                            <div style={{ fontSize: "12px", fontWeight: 700 }}>{a.name}</div>
+                            <div className="mono" style={{ fontSize: "10px", color: "#7a6440" }}>{a.desc}</div>
+                          </div>
+                          {earned && <Icon name="check" size={14} color="#4C8A57" />}
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {moreTab === "pool" && (
+              <div style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
+                <div style={{ padding: "10px", display: "flex", gap: "6px", flexWrap: "wrap", ...parchment }}>
+                  <select value={newQuest.cat} onChange={e => setNewQuest({ ...newQuest, cat: e.target.value })}>
+                    {Object.entries(STATS).map(([k, v]) => <option key={k} value={k}>{v.label}</option>)}
+                  </select>
+                  <input placeholder="Quest text…" value={newQuest.text} onChange={e => setNewQuest({ ...newQuest, text: e.target.value })} style={{ flex: 1, minWidth: "120px" }} />
+                  <input type="number" value={newQuest.xp} onChange={e => setNewQuest({ ...newQuest, xp: +e.target.value })} style={{ width: "60px" }} />
+                  <input placeholder="Ignition step (2-min starter)…" value={newQuest.ignition} onChange={e => setNewQuest({ ...newQuest, ignition: e.target.value })} style={{ flex: 1, minWidth: "160px" }} />
+                  <div className="btn btn3d" onClick={addPoolQuest} style={{ ...btnPrimary, padding: "6px 10px", display: "flex", alignItems: "center" }}><Icon name="plus" size={14} color="#f5ecd2" /></div>
+                </div>
+                <div className="mono" style={{ fontSize: "11px", color: "#b9ac8c" }}>{state.pool.length} quests in the pool. Each day draws 3, weighted toward whichever stat has fallen behind.</div>
+                {Object.entries(STATS).map(([key, def]) => (
+                  <div key={key} style={{ marginTop: "4px" }}>
+                    <div style={{ fontSize: "11px", color: def.color, marginBottom: "4px", fontWeight: 700 }} className="mono">{def.label.toUpperCase()}</div>
+                    {state.pool.filter(q => q.cat === key).map(q => (
+                      <div key={q.id} style={{ fontSize: "12px", color: "#e2d6b0", padding: "3px 0", display: "flex", justifyContent: "space-between" }}>
+                        <span>{q.text}</span><span className="mono" style={{ color: "#8a7550" }}>{q.xp}xp</span>
+                      </div>
+                    ))}
+                  </div>
+                ))}
+              </div>
+            )}
           </div>
-        )}
-      </div>
+        </div>
+      )}
 
       {toastMsg && (
-        <div style={{ position: "fixed", bottom: "18px", left: "50%", transform: "translateX(-50%)", background: "#1C1C28", border: `1px solid ${toastMsg.color}`, borderRadius: "8px", padding: "10px 16px", fontSize: "12px", color: "#E4DECB", boxShadow: "0 4px 20px rgba(0,0,0,0.4)" }} className="mono">
+        <div style={{ position: "fixed", bottom: "18px", left: "50%", transform: "translateX(-50%)", background: "linear-gradient(160deg, #f5e6bf, #ecd6a3)", border: `2px solid ${toastMsg.color}`, borderRadius: "8px", padding: "10px 16px", fontSize: "12px", color: "#3c2a16", fontWeight: 700, boxShadow: "0 6px 20px rgba(0,0,0,0.4)", animation: "popIn .18s ease" }} className="mono">
           {toastMsg.msg}
         </div>
       )}
