@@ -241,20 +241,40 @@ const LOADOUT_ITEMS = [
 ];
 
 const THEME_ARMOR_NAMES = {
-  kingdom: { helmet: "Knight's Helm", chest: "Iron Cuirass", legs: "Steel Greaves" },
-  roman: { helmet: "Legionary Helm", chest: "Segmented Cuirass", legs: "Marching Greaves" },
-  pirate: { helmet: "Tricorn Hat", chest: "Weathered Coat", legs: "Sea-Boots" },
-  space: { helmet: "Void Visor", chest: "Pressure Plate", legs: "Grav-Boots" },
-  cowboy: { helmet: "Ten-Gallon Hat", chest: "Tumbleweed Chestplate", legs: "Cowboy Leggings" },
-  future: { helmet: "Neural Crown", chest: "Circuit Vest", legs: "Kinetic Boots" },
+  kingdom: [
+    { key: "a", helmet: "Knight's Helm", chest: "Iron Cuirass", legs: "Steel Greaves" },
+    { key: "b", helmet: "Hooded Cowl", chest: "Leather Jerkin", legs: "Traveler's Boots" },
+  ],
+  roman: [
+    { key: "a", helmet: "Legionary Helm", chest: "Segmented Cuirass", legs: "Marching Greaves" },
+    { key: "b", helmet: "Centurion's Crest", chest: "Praetorian Plate", legs: "Sandal Guards" },
+  ],
+  pirate: [
+    { key: "a", helmet: "Tricorn Hat", chest: "Weathered Coat", legs: "Sea-Boots" },
+    { key: "b", helmet: "Bandana", chest: "Striped Vest", legs: "Rope-Bound Sandals" },
+  ],
+  space: [
+    { key: "a", helmet: "Void Visor", chest: "Pressure Plate", legs: "Grav-Boots" },
+    { key: "b", helmet: "Welding Mask", chest: "Utility Vest", legs: "Mag-Boots" },
+  ],
+  cowboy: [
+    { key: "a", helmet: "Ten-Gallon Hat", chest: "Tumbleweed Chestplate", legs: "Cowboy Leggings" },
+    { key: "b", helmet: "Bandana Mask", chest: "Denim Vest", legs: "Chap Guards" },
+  ],
+  future: [
+    { key: "a", helmet: "Neural Crown", chest: "Circuit Vest", legs: "Kinetic Boots" },
+    { key: "b", helmet: "Riot Visor", chest: "Kevlar Plate", legs: "Servo Greaves" },
+  ],
 };
 function themedArmorItems(theme) {
-  const names = THEME_ARMOR_NAMES[theme.key] || THEME_ARMOR_NAMES.kingdom;
-  return [
-    { id: `armor_helmet_${theme.key}`, slot: "helmet", name: names.helmet, desc: "+4 Defense, +10 max Health.", cost: 70, sprite: "helmetItem", def: 4, health: 10, themed: true },
-    { id: `armor_chest_${theme.key}`, slot: "chest", name: names.chest, desc: "+7 Defense, +20 max Health.", cost: 100, sprite: "chestItem", def: 7, health: 20, themed: true },
-    { id: `armor_legs_${theme.key}`, slot: "legs", name: names.legs, desc: "+5 Defense, +14 max Health.", cost: 80, sprite: "legsItem", def: 5, health: 14, themed: true },
-  ];
+  const sets = THEME_ARMOR_NAMES[theme.key] || THEME_ARMOR_NAMES.kingdom;
+  const items = [];
+  sets.forEach(set => {
+    items.push({ id: `armor_helmet_${set.key}_${theme.key}`, slot: "helmet", name: set.helmet, desc: "+4 Defense, +10 max Health.", cost: 70, sprite: "helmetItem", def: 4, health: 10, themed: true });
+    items.push({ id: `armor_chest_${set.key}_${theme.key}`, slot: "chest", name: set.chest, desc: "+7 Defense, +20 max Health.", cost: 100, sprite: "chestItem", def: 7, health: 20, themed: true });
+    items.push({ id: `armor_legs_${set.key}_${theme.key}`, slot: "legs", name: set.legs, desc: "+5 Defense, +14 max Health.", cost: 80, sprite: "legsItem", def: 5, health: 14, themed: true });
+  });
+  return items;
 }
 function allPoolItems(state) {
   const theme = THEMES.find(t => t.key === state.run.theme) || THEMES[0];
@@ -599,7 +619,7 @@ function TheLedger() {
 
         const liveTheme = THEMES.find(t => t.key === s.run.theme) || THEMES[0];
         const pool = allPoolItems(s);
-        s.shop = { date: todayStr(), stock: pool.sort(() => Math.random() - 0.5).slice(0, 4).map(i => i.id), rerollsUsed: 0 };
+        s.shop = { date: todayStr(), stock: pool.sort(() => Math.random() - 0.5).slice(0, 5).map(i => i.id), rerollsUsed: 0 };
         if (!s.pendingEnemy) s.pendingEnemy = rollEnemy(liveTheme, charLevelOf(s));
       }
 
@@ -999,7 +1019,7 @@ function TheLedger() {
       const cost = 8 * (prev.shop.rerollsUsed + 1);
       if (prev.shards < cost) { showToast("Not enough shards to reroll", "#8e2b2b"); return prev; }
       const pool = allPoolItems(prev);
-      const stock = pool.sort(() => Math.random() - 0.5).slice(0, 4).map(i => i.id);
+      const stock = pool.sort(() => Math.random() - 0.5).slice(0, 5).map(i => i.id);
       showToast("Shop restocked", "#CB9A3E");
       return { ...prev, shards: prev.shards - cost, shop: { date: todayStr(), stock, rerollsUsed: prev.shop.rerollsUsed + 1 } };
     });
@@ -1467,20 +1487,20 @@ function TheLedger() {
                 </div>
               )}
 
-              <div className="mono" style={{ fontSize: "10px", color: "#b9ac8c", marginBottom: "6px" }}>FULL CATALOG</div>
+              <div className="mono" style={{ fontSize: "10px", color: "#b9ac8c", marginBottom: "2px" }}>FULL CATALOG</div>
+              <div className="mono" style={{ fontSize: "10px", color: "#8a7550", marginBottom: "6px" }}>Browse only — items are purchasable when they show up in Today's Shop.</div>
               <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
                 {allPoolItems(state).map(item => {
                   const owned = state.ownedLoadout.includes(item.id);
-                  const affordable = state.shards >= item.cost;
                   return (
-                    <div key={item.id} className="lift" style={{ padding: "10px", display: "flex", alignItems: "center", gap: "10px", ...parchment, opacity: owned ? 0.6 : 1 }}>
+                    <div key={item.id} style={{ padding: "10px", display: "flex", alignItems: "center", gap: "10px", ...parchment, opacity: owned ? 0.6 : 0.85 }}>
                       <div style={itemSlot(theme.accent)}><Sprite name={item.sprite} tint={theme.accent} size={2} /></div>
                       <div style={{ flex: 1 }}>
                         <div style={{ fontSize: "12px", fontWeight: 700 }}>{themedName(item, theme)} <span className="mono" style={{ fontSize: "9px", color: "#7a6440" }}>({item.slot})</span></div>
                         <div className="mono" style={{ fontSize: "10px", color: "#7a6440" }}>{item.desc}</div>
                       </div>
                       {owned ? <span className="mono" style={{ fontSize: "10px", color: "#4C8A57", fontWeight: 700 }}>Owned</span> : (
-                        <div className="btn btn3d" onClick={() => buyLoadoutItem(item.id)} style={{ ...(affordable ? btnPrimary : btnGhost), padding: "5px 9px", fontSize: "10px" }}>{item.cost} <Icon name="gem" size={10} color={affordable ? "#f5ecd2" : "#7a6440"} style={{ verticalAlign: "-1px" }} /></div>
+                        <span className="mono" style={{ fontSize: "10px", color: "#7a6440" }}>{item.cost} <Icon name="gem" size={10} color="#7a6440" style={{ verticalAlign: "-1px" }} /></span>
                       )}
                     </div>
                   );
